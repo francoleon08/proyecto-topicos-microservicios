@@ -1,0 +1,25 @@
+{
+  "name": "movies",
+  "version": "1.0.0",
+  "description": "CRUD database MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/francoleon08/proyecto-topicos-microservicios.git#master"
+  },
+  "author": "Franco Leon, Manuel Lagos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/francoleon08/proyecto-topicos-microservicios/issues"
+  },
+  "homepage": "https://github.com/francoleon08/proyecto-topicos-microservicios/tree/master#readme",
+  "dependencies": {
+    "express": "^4.21.1",
+    "nodemon": "^3.1.7",
+    "realm-web": "^2.0.1"
+  }
+}
