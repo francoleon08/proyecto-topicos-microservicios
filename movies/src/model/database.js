@@ -1,66 +1,64 @@
 const Realm = require("realm-web");
+const {getFromCache, cacheResult} = require('../cache/redisClient');
 require('dotenv').config();
 
-id_mongo = process.env.MONGODB_APP_ID;
+const MONGODB_APP_ID = process.env.MONGODB_APP_ID;
 
-const app = new Realm.App({ id: id_mongo });
+const app = new Realm.App({ id: MONGODB_APP_ID });
 
-async function getRandomMovies(n) {        
+async function getAuthenticatedUser() {
     const credentials = Realm.Credentials.anonymous();
-
-    try {        
+    try {
         const user = await app.logIn(credentials);
-
-        if (!user) {
-            console.error("Failed to log in as an anonymous user.");
-            return [];
-        }
-    
-        const result = await user.functions.get_n_randoms_movies(n);
-                
-        return result;
+        return user || null;
     } catch (err) {
-        console.error("Failed to log in as an anonymous user.", err);
+        console.error("Error de autenticación anónima:", err);
+        return null;
+    }
+}
+
+async function getRandomMovies(n) {
+    const user = await getAuthenticatedUser();
+    if (!user) return [];
+    
+    try {
+        return await user.functions.get_n_randoms_movies(n);
+    } catch (err) {
+        console.error("Error al obtener películas aleatorias:", err);
         return [];
     }
 }
 
 async function getMovieByTitle(title) {
-    const credentials = Realm.Credentials.anonymous();
+    const cachedMovie = await getFromCache(title);
+    if (cachedMovie) return cachedMovie;
+    
+    const user = await getAuthenticatedUser();
+    if (!user) return null;
 
     try {
-        const user = await app.logIn(credentials);
-
-        if (!user) {
-            console.error("Failed to log in as an anonymous user.");
-            return [];
-        }
-
-        const result = await user.functions.get_movie_by_title(title);
-
-        return result;
+        const movie = await user.functions.get_movie_by_title(title);
+        await cacheResult(title, movie);
+        return movie;
     } catch (err) {
-        console.error("Failed to log in as an anonymous user.", err);
-        return [];
+        console.error("Error al obtener película por título:", err);
+        return null;
     }
 }
 
 async function getMovieByDirector(director) {
-    const credentials = Realm.Credentials.anonymous();
-
+    const cachedMovies = await getFromCache(director);
+    if (cachedMovies) return cachedMovies;
+    
+    const user = await getAuthenticatedUser();
+    if (!user) return [];
+    
     try {
-        const user = await app.logIn(credentials);
-
-        if (!user) {
-            console.error("Failed to log in as an anonymous user.");
-            return [];
-        }
-
-        const result = await user.functions.get_movie_by_director(director);
-
-        return result;
+        const movies = await user.functions.get_movie_by_director(director);
+        await cacheResult(director, movies);
+        return movies;
     } catch (err) {
-        console.error("Failed to log in as an anonymous user.", err);
+        console.error("Error al obtener películas por director:", err);
         return [];
     }
 }

@@ -12,7 +12,6 @@ router.get('/random', async (req, res) => {
             return res.status(400).send('Invalid limit parameter');
         }
 
-
         const movies = await Movie.getRandomMovies(parsedLimit);
         res.json(movies);
     } catch (error) {
