@@ -19,6 +19,21 @@ router.get('/random', async (req, res) => {
     }
 });
 
+router.get('/', async (req, res) => {
+    try {
+        const {id} = req.query;
+        
+        if (!id) {
+            return res.status(400).send('Invalid id parameter');
+        }
+
+        const movie = await Movie.getMovieById(id);
+        res.json(movie);
+    } catch (error) {
+        res.status(500).send('Error fetching movies');
+    }
+});
+
 router.post('/title', async (req, res) => {
     try {
         const { title } = req.body;

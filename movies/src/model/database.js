@@ -29,6 +29,28 @@ async function getRandomMovies(n) {
     }
 }
 
+async function getMovieById(id) {    
+    const cachedMovie = await getFromCache(id);
+    if (cachedMovie) return cachedMovie;
+    
+    const user = await getAuthenticatedUser();
+    if (!user) return null;
+
+    try {
+        const movie = await user.functions.get_movie_by_imdb_id(id);
+
+        if (movie.code === 404) 
+            return movie.mensaje;      
+
+        await cacheResult(id, movie);
+        return movie;
+    } catch (err) {
+        console.error("Error al obtener película por id:", err);
+        return null;
+    }
+    
+}
+
 async function getMovieByTitle(title) {
     const cachedMovie = await getFromCache(title);
     if (cachedMovie) return cachedMovie;
@@ -38,6 +60,10 @@ async function getMovieByTitle(title) {
 
     try {
         const movie = await user.functions.get_movie_by_title(title);
+
+        if (movie.code === 404) 
+            return movie.mensaje;  
+
         await cacheResult(title, movie);
         return movie;
     } catch (err) {
@@ -55,6 +81,10 @@ async function getMovieByDirector(director) {
     
     try {
         const movies = await user.functions.get_movie_by_director(director);
+
+        if (movie.code === 404) 
+            return movie.mensaje;  
+
         await cacheResult(director, movies);
         return movies;
     } catch (err) {
@@ -63,4 +93,4 @@ async function getMovieByDirector(director) {
     }
 }
 
-module.exports = { getRandomMovies, getMovieByTitle, getMovieByDirector };
+module.exports = { getRandomMovies, getMovieById, getMovieByTitle, getMovieByDirector };
