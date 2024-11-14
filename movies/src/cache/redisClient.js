@@ -10,7 +10,8 @@ redisClient.on('error', (err) => {
 
 redisClient.connect()
     .then(() => {
-        console.log('Redis client connected');
+        redisClient.flushAll();    
+        console.log('Redis client connected and flushed');
     })
     .catch((err) => {
         console.error('Redis client connection error', err);
@@ -27,10 +28,5 @@ async function getFromCache(key) {
 async function cacheResult(key, value) {
     await redisClient.set(key, JSON.stringify(value), 'EX', CACHE_EXPIRATION_TIME);
 }
-
-process.on('exit', () => {
-    redisClient.quit();
-    redisClient.flushAll();    
-});
 
 module.exports = {getFromCache, cacheResult};

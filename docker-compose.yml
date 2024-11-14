@@ -2,11 +2,10 @@ version: '3.8'
 
 services:
   movies:
+    image: movies-image
     build:
       context: ./movies
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
     depends_on:
       - redis
     environment:
@@ -15,12 +14,30 @@ services:
       - REDIS_URL=redis://redis:6379
     networks:
       - cache-tier
+      - general
 
   redis:
     image: redis:alpine    
     networks:
       - cache-tier
 
+  random-movies:
+    image: random-movies-image
+    build:
+      context: ./random-movies
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      - PORT=3000
+      - URL_MOVIES=http://movies:3000
+    depends_on:
+      - movies
+    networks:
+      - general
+
 networks:
   cache-tier:
+    driver: bridge
+  general:
     driver: bridge
