@@ -35,9 +35,41 @@ services:
       - movies
     networks:
       - general
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672" # Se exponen los puertos de rabbitmq solo para test, luego se ocultan
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    networks:
+      - rabbit-tier      
+  
+  history:
+    image: history-image
+    build:
+      context: ./historial
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Se exponen los puertos de history solo para test, luego se ocultan
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin
+    depends_on: 
+      - rabbitmq
+    networks:
+      - rabbit-tier
+      - general
 
 networks:
   cache-tier:
+    driver: bridge
+  rabbit-tier:
     driver: bridge
   general:
     driver: bridge
