@@ -2,14 +2,14 @@
 
 ### 1. Obtener Películas al Azar
 
-**Ruta:** `GET /random`  
+**Ruta:** `GET /movies/random`  
 **Descripción:** Retorna una lista de películas aleatorias, según el límite especificado.  
 **Parámetros de Consulta (Query Params):**
 - `limit`: Número de películas a retornar. Debe ser un número entero positivo.
 
 **Ejemplo de Solicitud:**
 ```bash
-GET /random?limit=5
+GET /movies/random?limit=5
 ```
 
 **Respuestas:**
@@ -21,14 +21,14 @@ GET /random?limit=5
 
 ### 2. Obtener Película por ID
 
-**Ruta:** `GET /`  
+**Ruta:** `GET /movies`  
 **Descripción:** Retorna los detalles de una película específica según su ID.  
 **Parámetros de Consulta (Query Params):**
 - `id` (requerido): ID de la película a buscar.
 
 **Ejemplo de Solicitud:**
 ```bash
-GET /?id=12345
+GET /movies?id=12345
 ```
 
 **Respuestas:**
@@ -40,14 +40,14 @@ GET /?id=12345
 
 ### 3. Buscar Películas por Título
 
-**Ruta:** `POST /title`  
+**Ruta:** `POST /movies/title`  
 **Descripción:** Busca películas cuyo título coincide con el texto proporcionado.  
 **Cuerpo de la Solicitud (Request Body):**
 - `title` (requerido): Título o parte del título de la película.
 
 **Ejemplo de Solicitud:**
 ```bash
-POST /title
+POST /movies/title
 Content-Type: application/json
 
 {
@@ -64,14 +64,14 @@ Content-Type: application/json
 
 ### 4. Buscar Películas por Director
 
-**Ruta:** `POST /director`  
+**Ruta:** `POST /movies/director`  
 **Descripción:** Busca películas cuyo director coincide con el nombre proporcionado.  
 **Cuerpo de la Solicitud (Request Body):**
 - `director` (requerido): Nombre del director o parte del nombre.
 
 **Ejemplo de Solicitud:**
 ```bash
-POST /director
+POST /movies/director
 Content-Type: application/json
 
 {
@@ -79,9 +79,55 @@ Content-Type: application/json
 }
 ```
 
+### 5. Buscar Películas por filtro
+
+**Ruta:** `POST /movies/filter`  
+**Descripción:** Busca películas que cumplan con los filtros proporcionados.
+**Parámetros de Consulta (Query Params):**
+- `limit` (requerido): Límite de películas a retornar. Debe ser un número entero positivo.
+**Cuerpo de la Solicitud (Request Body):**
+```json
+{
+  "genres": [
+    "Drama"
+  ],
+  "cast": [
+    "Frank Powell",
+  ],
+  "directors" : [
+    "D.W. Griffith"
+  ],
+  "languages": [
+    "English"
+  ]
+}
+```
+El json puede tener más atributos.
+
+**Ejemplo de Solicitud:**
+```bash
+POST /movies/filter?limit=1000
+Content-Type: application/json
+
+{
+  "genres": [
+    "Drama"
+  ],
+  "cast": [
+    "Frank Powell",
+  ],
+  "directors" : [
+    "D.W. Griffith"
+  ],
+  "languages": [
+    "English"
+  ]
+}
+```
+
 **Respuestas:**
-- `200 OK`: Retorna un arreglo de películas dirigidas por el director especificado.
-- `400 Bad Request`: Si el parámetro `director` no se proporciona en el cuerpo de la solicitud.
+- `200 OK`: Retorna un arreglo de películas (1000 como máximo) que cumplen con los filtros proporcionados.
+- `400 Bad Request`: No se pudieron obtener las películas.
 - `500 Internal Server Error`: Si ocurre un error en el servidor.
 
 ## Instalación individual
