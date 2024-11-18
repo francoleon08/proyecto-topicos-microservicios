@@ -1,3 +1,0 @@
-movie_id,imdb_id,title,original_title,directors,release_year,average_rating,ratings_count,poster_url,thumbnail_url,genres
-1,tt1375666,Inception,Inception,Christopher Nolan,2010,8.8,2100000,https://example.com/poster_large.jpg,https://example.com/poster_small.jpg,"action, sci-fi, thriller"
-2,tt0816692,Interstellar,Interstellar,Christopher Nolan,2014,8.6,1500000,https://example.com/poster_large2.jpg,https://example.com/poster_small2.jpg,"adventure, drama, sci-fi"

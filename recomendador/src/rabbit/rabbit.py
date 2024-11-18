@@ -1,0 +1,61 @@
+import pika
+import requests
+import json
+
+RABBITMQ_URL = 'amqp://rabbitmq:5672'
+MOVIES_QUEUE = 'movies'
+RECOMMENDATIONS_QUEUE = 'recommendations'
+MOVIES_SERVICE_URL = 'http://movies:3000/movies'
+
+def get_rabbitmq_channel():
+    connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
+    channel = connection.channel()
+    channel.queue_declare(queue=RECOMMENDATIONS_QUEUE, durable=True)
+    return channel
+
+def fetch_recommendable_movies():
+    try:
+        response = requests.get(MOVIES_SERVICE_URL)
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        print(f"Error fetching recommendable movies: {e}")
+        raise
+
+def fetch_movie_history_from_queue():
+    try:
+        connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
+        channel = connection.channel()
+        channel.queue_declare(queue=MOVIES_QUEUE, durable=True)
+
+        method_frame, header_frame, body = channel.basic_get(queue=MOVIES_QUEUE)
+        if body:
+            movie_history = json.loads(body)
+            print(f"Received movie history from queue: {movie_history}")
+            channel.basic_ack(method_frame.delivery_tag)
+            return movie_history
+        else:
+            print("No message received from the movies queue")
+            return []
+    except Exception as e:
+        print(f"Error fetching movie history from queue: {e}")
+        return []
+
+def send_recommendations_to_rabbitmq(recommendations):
+    try:
+        channel = get_rabbitmq_channel()
+        result_message = json.dumps({
+            'recommendations': recommendations
+        })
+        channel.basic_publish(
+            exchange='',
+            routing_key=RECOMMENDATIONS_QUEUE,
+            body=result_message,
+            properties=pika.BasicProperties(
+                delivery_mode=2  
+            )
+        )
+        print("Sent recommendations to RECOMMENDATIONS_QUEUE")
+    except Exception as e:
+        print(f"Error sending recommendations to RabbitMQ: {e}")
+        raise
