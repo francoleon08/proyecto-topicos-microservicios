@@ -93,4 +93,17 @@ async function getMovieByDirector(director) {
     }
 }
 
-module.exports = { getRandomMovies, getMovieById, getMovieByTitle, getMovieByDirector };
+async function getMoviesByFilter(filter, limit) {
+    const user = await getAuthenticatedUser();
+    if (!user) return [];
+    
+    try {
+        const movies = await user.functions.get_movie_by_filter(filter, limit);
+        return movies;
+    } catch (err) {
+        console.error("Error al obtener películas por director:", err);
+        return [];
+    }
+}
+
+module.exports = { getRandomMovies, getMovieById, getMovieByTitle, getMovieByDirector, getMoviesByFilter };

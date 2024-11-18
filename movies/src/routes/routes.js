@@ -64,4 +64,21 @@ router.post('/director', async (req, res) => {
     }
 });
 
+router.post('/filter', async (req, res) => {
+    try {
+        const filter = req.body;
+        const {limit} = req.query;
+        const parsedLimit = parseInt(limit, 10);
+
+        if (!filter) {
+            return res.status(400).send('Invalid filter parameter');
+        }
+
+        const movies = await Movie.getMoviesByFilter(filter, parsedLimit);
+        res.json(movies);
+    } catch (error) {
+        res.status(500).send('Error fetching movies');
+    }
+});
+
 module.exports = router;
