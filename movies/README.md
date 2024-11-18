@@ -79,9 +79,55 @@ Content-Type: application/json
 }
 ```
 
+### 5. Buscar Películas por filtro
+
+**Ruta:** `POST /movies/filter`  
+**Descripción:** Busca películas que cumplan con los filtros proporcionados.
+**Parámetros de Consulta (Query Params):**
+- `limit` (requerido): Límite de películas a retornar. Debe ser un número entero positivo.
+**Cuerpo de la Solicitud (Request Body):**
+```json
+{
+  "genres": [
+    "Drama"
+  ],
+  "cast": [
+    "Frank Powell",
+  ],
+  "directors" : [
+    "D.W. Griffith"
+  ],
+  "languages": [
+    "English"
+  ]
+}
+```
+El json puede tener más atributos.
+
+**Ejemplo de Solicitud:**
+```bash
+POST /movies/filter?limit=1000
+Content-Type: application/json
+
+{
+  "genres": [
+    "Drama"
+  ],
+  "cast": [
+    "Frank Powell",
+  ],
+  "directors" : [
+    "D.W. Griffith"
+  ],
+  "languages": [
+    "English"
+  ]
+}
+```
+
 **Respuestas:**
-- `200 OK`: Retorna un arreglo de películas dirigidas por el director especificado.
-- `400 Bad Request`: Si el parámetro `director` no se proporciona en el cuerpo de la solicitud.
+- `200 OK`: Retorna un arreglo de películas (1000 como máximo) que cumplen con los filtros proporcionados.
+- `400 Bad Request`: No se pudieron obtener las películas.
 - `500 Internal Server Error`: Si ocurre un error en el servidor.
 
 ## Instalación individual
