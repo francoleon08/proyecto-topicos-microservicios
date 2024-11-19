@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from rabbit.rabbitmq_manager import fetch_movie_history_from_queue, send_recommendations_to_queue
+from rabbit.rabbit.py import fetch_movie_history_from_queue, send_recommendations_to_rabbitmq
 from recommender.recommender import process_recommendations
 
 app = Flask(__name__)
@@ -15,7 +15,9 @@ def process_movies():
 
         recommendations = process_recommendations(movie_history)
 
-        send_recommendations_to_queue(recommendations)
+        recommendations_json = json.dumps(recommendations)
+    
+        send_recommendations_to_rabbimq(recommendations_json)
 
         return jsonify({"message": "Recommendations processed successfully", "recommendations": recommendations}), 200
 

@@ -5,22 +5,12 @@ import json
 RABBITMQ_URL = 'amqp://rabbitmq:5672'
 MOVIES_QUEUE = 'movies'
 RECOMMENDATIONS_QUEUE = 'recommendations'
-MOVIES_SERVICE_URL = 'http://movies:3000/movies'
 
 def get_rabbitmq_channel():
     connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
     channel = connection.channel()
     channel.queue_declare(queue=RECOMMENDATIONS_QUEUE, durable=True)
     return channel
-
-def fetch_recommendable_movies():
-    try:
-        response = requests.get(MOVIES_SERVICE_URL)
-        response.raise_for_status()
-        return response.json()
-    except Exception as e:
-        print(f"Error fetching recommendable movies: {e}")
-        raise
 
 def fetch_movie_history_from_queue():
     try:

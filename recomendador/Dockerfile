@@ -1,11 +1,13 @@
-FROM node:18-alpine
+FROM python:3.9-slim
 
 WORKDIR /usr/src/app
 
 COPY . .
 
-RUN npm install
+RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 3000
+EXPOSE 8080
 
-CMD ["node", "format.js"]
+ENV NAME World
+
+CMD ["python", "main.py"]
