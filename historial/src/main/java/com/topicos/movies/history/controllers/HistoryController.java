@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/history")
 public class HistoryController {
@@ -45,7 +47,7 @@ public class HistoryController {
         try {
             return ResponseEntity.ok(moviesService.getHistory());
         } catch (EmptyHistoryMoviesException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.ok(new ArrayList<>());
         }
     }
 }
