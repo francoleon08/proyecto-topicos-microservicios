@@ -9,7 +9,7 @@ import { Movie } from "./types/Movie.ts";
 import { Handlers } from "./types/Handlers.ts";
 import "./App.css";
 
-const URL_MOVIES = "http://random-movies/randommovies?limit=30"
+const URL_MOVIES = "http://random-movies:3001/randommovies?limit=30"
 const URL_HISTORY = "http://history:8080/history/allHistory"
 
 function App() {
@@ -37,8 +37,8 @@ function App() {
   const [history, setHistory] = useState<Movie[]>([]);
 
   const addMovie = (movie: Movie) => {
-    setHistory((history) => {
-      const exists = history.some((prev) => prev.imdb === movie.imdb);
+    setHistory((history: Movie[]) => {
+      const exists = history.some((prev: Movie) => prev.imdb === movie.imdb);
       return exists ? history : [movie, ...history];
     });
   };
