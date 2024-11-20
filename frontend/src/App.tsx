@@ -9,8 +9,11 @@ import { Movie } from "./types/Movie.ts";
 import { Handlers } from "./types/Handlers.ts";
 import "./App.css";
 
-const URL_MOVIES = "http://random-movies:3001/randommovies?limit=30"
-const URL_HISTORY = "http://history:8080/history/allHistory"
+const VITE_URL_MOVIES = import.meta.env.VITE_URL_MOVIES;
+const VITE_URL_HISTORY = import.meta.env.VITE_URL_HISTORY;
+
+const URL_MOVIES = VITE_URL_MOVIES + "/randommovies?limit=30"
+const URL_HISTORY = VITE_URL_HISTORY + "/history/allHistory"
 
 function App() {
   const {
