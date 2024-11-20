@@ -89,6 +89,21 @@ services:
     networks:
       - rabbit-tier
       - general
+      
+  frontend:
+    image: frontend-image
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - URL_RANDOM_MOVIES=http://random-movies:3001
+      - URL_HISTORY=http://history:8080
+    depends_on:
+      - random-movies
+      - history
+    networks:
+      - general
+      - rabbit-tier
 
 networks:
   cache-tier:

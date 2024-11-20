@@ -1,0 +1,10 @@
+button {
+    border: none;
+    background: none;
+    max-width: fit-content;
+}
+
+button span {
+    color: red;
+    font-size: 3em;
+}

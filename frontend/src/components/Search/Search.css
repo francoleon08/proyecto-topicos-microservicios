@@ -1,0 +1,27 @@
+#searchbar {
+    display: flex;
+    color: var(--text-color);
+}
+
+#input {
+    width: 100%;
+    background-color: inherit;
+    color: inherit;
+    border: none;
+    font-size: 1em;
+}
+
+#input:focus {
+    outline: none;
+}
+
+#icon {
+    user-select: none;
+    margin: 0 0.5em;
+    font-size: 2em;
+
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
