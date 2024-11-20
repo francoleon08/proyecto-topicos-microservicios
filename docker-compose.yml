@@ -27,9 +27,9 @@ services:
     image: random-movies-image
     build:
       context: ./random-movies
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile   
     ports:
-      - "3001:3000"
+      - "3000:3000"
     environment:
       - PORT=3000
       - URL_MOVIES=http://movies:3000
@@ -54,9 +54,9 @@ services:
     image: history-image
     build:
       context: ./historial
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile 
     ports:
-      - "8080:8080" # Se exponen los puertos de history solo para test, luego se ocultan
+      - "8080:8080"
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PORT=5672
@@ -95,15 +95,16 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    environment:
-      - URL_RANDOM_MOVIES=http://random-movies:3001
-      - URL_HISTORY=http://history:8080
+      args:
+        - VITE_URL_MOVIES= http://localhost:3000
+        - VITE_URL_HISTORY= http://localhost:8080
+    ports:
+      - "80:80"
     depends_on:
       - random-movies
       - history
     networks:
       - general
-      - rabbit-tier
 
 networks:
   cache-tier:
