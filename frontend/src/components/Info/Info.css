@@ -1,0 +1,8 @@
+.info {
+    flex: 1;
+}
+
+h1 {
+    font-size: 3em;
+    font-family: var(--title-font), sans-serif;
+}
