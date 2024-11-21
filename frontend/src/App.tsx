@@ -41,7 +41,7 @@ function App() {
 
   const addMovie = (movie: Movie) => {
     setHistory((history: Movie[]) => {
-      const exists = history.some((prev: Movie) => prev.imdb === movie.imdb);
+      const exists = history.some((prev: Movie) => prev.imdb.id === movie.imdb.id);
       return exists ? history : [movie, ...history];
     });
   };
