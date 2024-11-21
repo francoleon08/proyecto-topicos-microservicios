@@ -51,9 +51,9 @@ services:
     image: history-image
     build:
       context: ./historial
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile 
     ports:
-      - "8080:8080" # Se exponen los puertos de history solo para test, luego se ocultan
+      - "8080:8080"
     environment:
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_RABBITMQ_PORT=5672
@@ -63,6 +63,24 @@ services:
       - rabbitmq
     networks:
       - rabbit-tier
+      - general
+
+  frontend:
+    image: frontend-image
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_URL_MOVIES=http://localhost:3000
+        - VITE_URL_HISTORY=http://localhost:8080
+        - VITE_URL_PROXY=http://localhost:3002
+        - VITE_CLICKS_COUNT=5
+    ports:
+      - "80:80"
+    depends_on:
+      - random-movies
+      - history
+    networks:
       - general
 
   proxy:

@@ -1,0 +1,20 @@
+.slider {
+    overflow-x: auto;
+    white-space: nowrap;
+    cursor: grab;
+}
+
+.slider-container {
+    margin: 1% auto;
+}
+
+.slider-title {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: left;
+    padding: 1% 0;
+}
+
+.slide-card {
+    display: inline-block;
+}

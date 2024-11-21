@@ -1,0 +1,34 @@
+header {
+    width: 100%;
+    height: 10vh;
+    position: fixed;
+    top: 0;
+    z-index: 1;
+    padding: 3%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--header-background-color);
+    color: var(--header-text-color);
+}
+
+header div {
+    display: flex;
+    gap: 3%;
+    flex: 1;
+}
+
+header img {
+    width: 10%;
+    height: auto;
+}
+
+#searchbar {
+    margin: 0 3%;
+    flex: 1;
+}
+
+main {
+    padding: 3%;
+    margin-top: 5%;
+}
