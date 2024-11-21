@@ -25,11 +25,10 @@ services:
     image: random-movies-image
     build:
       context: ./random-movies
-      dockerfile: Dockerfile   
+      dockerfile: Dockerfile         
     ports:
-      - "3000:3000"
-    environment:
-      - PORT=3000
+      - "3000:8080"
+    environment:      
       - URL_MOVIES=http://movies:3000
     depends_on:
       - movies
@@ -82,6 +81,25 @@ services:
       - random-movies
       - history
     networks:
+      - general
+
+  proxy:
+    image: proxy-image
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+    environment:
+      - PORT=3000
+      - RANDOM_MOVIES_URL=http://random-movies:3000
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+      - RABBITMQ_MOVIES_QUEUE=movies
+      - RABBITMQ_RECOMMENDATIONS_QUEUE=recommendation
+    depends_on:
+      - rabbitmq
+    networks:
+      - rabbit-tier
       - general
 
 networks:
