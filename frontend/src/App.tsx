@@ -12,7 +12,7 @@ import "./App.css";
 
 const VITE_URL_MOVIES = import.meta.env.VITE_URL_MOVIES;
 const VITE_URL_HISTORY = import.meta.env.VITE_URL_HISTORY;
-const CLICKS_COUNT = import.meta.env.VITE_CLICKS_COUNT | 5;
+const CLICKS_COUNT = Number(import.meta.env.VITE_CLICKS_COUNT);
 
 const URL_MOVIES = VITE_URL_MOVIES + "/randommovies?limit=30";
 const URL_HISTORY = VITE_URL_HISTORY + "/history/allHistory";
