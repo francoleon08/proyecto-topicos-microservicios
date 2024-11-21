@@ -25,11 +25,10 @@ services:
     image: random-movies-image
     build:
       context: ./random-movies
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile         
     ports:
-      - "3001:3000"
-    environment:
-      - PORT=3000
+      - "3000:8080"
+    environment:      
       - URL_MOVIES=http://movies:3000
     depends_on:
       - movies
