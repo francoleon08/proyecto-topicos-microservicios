@@ -17,10 +17,10 @@ export const getRecommendation = async () => {
     import.meta.env.VITE_URL_PROXY + "/movie/recommendation";
   let data: object = {};
   await fetch(URL_RECOMMENDATIONS)
-    .then((response) => {
+    .then(async (response) => {
       if (!response.ok)
         console.log(`There was an error fetching data: ${response.status}`);
-      else data = response.json();
+      else data = await response.json();
     })
     .catch((error) => {
       console.log(error.message);
