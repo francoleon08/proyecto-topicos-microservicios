@@ -1,13 +1,14 @@
 import { Movie } from "../../types/Movie.ts";
 
-const HISTORY_URL = "http://localhost:8080/history";
+const VITE_URL_MOVIES = import.meta.env.VITE_URL_MOVIES;
+const HISTORY_URL = VITE_URL_MOVIES + "/history";
 
 export const addToHistory = async (movie: Movie) => {
   try {
     const response = await fetch(HISTORY_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         id: movie.id,
