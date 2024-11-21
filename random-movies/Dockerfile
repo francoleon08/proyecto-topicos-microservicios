@@ -1,11 +1,19 @@
-FROM node:18-alpine
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /app
 
-WORKDIR /usr/src/app
+ARG URL_MOVIES
+ENV URL_MOVIES=$URL_MOVIES
 
-COPY . .
+COPY *.csproj ./
+RUN dotnet restore
 
-RUN npm install
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-EXPOSE 3000
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/out .
 
-CMD ["node", "index.js"]
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "random-movies.dll"]
