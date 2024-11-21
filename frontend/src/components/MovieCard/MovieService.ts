@@ -10,7 +10,6 @@ export const addToHistory = async (movie: Movie) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: movie.id,
         imdb: movie.imdb,
         title: movie.title,
         poster: movie.poster,
