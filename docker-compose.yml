@@ -96,8 +96,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_URL_MOVIES= http://localhost:3000
-        - VITE_URL_HISTORY= http://localhost:8080
+        - VITE_URL_MOVIES=http://localhost:3000
+        - VITE_URL_HISTORY=http://localhost:8080
+        - VITE_URL_PROXY=http://localhost:3002
+        - VITE_CLICKS_COUNT=5
     ports:
       - "80:80"
     depends_on:

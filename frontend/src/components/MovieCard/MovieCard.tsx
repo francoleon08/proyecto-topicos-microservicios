@@ -13,7 +13,8 @@ interface Props {
 
 function MovieCard({ movie, handlers }: Props) {
   const handleClick = () => {
-    handlers.addMovie(movie);
+    handlers.addMovieToHistory(movie);
+    handlers.registerClick(movie);
     addToHistory(movie);
     registerLike(movie);
   };

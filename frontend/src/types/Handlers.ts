@@ -1,5 +1,6 @@
 import { Movie } from "./Movie.ts";
 
 export interface Handlers {
-  addMovie: (movie: Movie) => void;
+  addMovieToHistory: (movie: Movie) => void;
+  registerClick: (movie: Movie) => void;
 }
