@@ -6,6 +6,8 @@ services:
     build:
       context: ./movies
       dockerfile: Dockerfile
+    ports:
+      - "3003:3000"
     depends_on:
       - redis
     environment:
@@ -71,7 +73,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_URL_MOVIES=http://localhost:3000
+        - VITE_URL_MOVIES=http://localhost:3003
+        - VITE_URL_RANDOM_MOVIES=http://localhost:3000
         - VITE_URL_HISTORY=http://localhost:8080
         - VITE_URL_PROXY=http://localhost:3002
         - VITE_CLICKS_COUNT=5
