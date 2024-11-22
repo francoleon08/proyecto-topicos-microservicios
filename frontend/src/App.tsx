@@ -5,16 +5,16 @@ import User from "./components/User/User.tsx";
 import Theme from "./components/Theme/Theme.tsx";
 import Slider from "./components/Slider/Slider.tsx";
 import useFetch from "./hooks/useFetch.ts";
-import { addMovie, getRecommendation } from "./utils/utils.ts";
+import { addMovie, getRecommendation, searchMovie } from "./utils/utils.ts";
 import { Movie } from "./types/Movie.ts";
 import { Handlers } from "./types/Handlers.ts";
 import "./App.css";
 
-const VITE_URL_MOVIES = import.meta.env.VITE_URL_MOVIES;
+const VITE_URL_RANDOM_MOVIES = import.meta.env.VITE_URL_RANDOM_MOVIES;
 const VITE_URL_HISTORY = import.meta.env.VITE_URL_HISTORY;
 const CLICKS_COUNT = Number(import.meta.env.VITE_CLICKS_COUNT);
 
-const URL_MOVIES = VITE_URL_MOVIES + "/randommovies?limit=30";
+const URL_RANDOM_MOVIES = VITE_URL_RANDOM_MOVIES + "/randommovies?limit=30";
 const URL_HISTORY = VITE_URL_HISTORY + "/history/allHistory";
 
 function App() {
@@ -22,13 +22,13 @@ function App() {
     data: movies,
     loading: loadingMovies,
     error: errorMovies,
-  } = useFetch<Movie[]>(URL_MOVIES);
+  } = useFetch<Movie[]>(URL_RANDOM_MOVIES);
 
   const {
     data: loadedForyou,
     loading: loadingForyou,
     error: errorForyou,
-  } = useFetch<Movie[]>(URL_MOVIES);
+  } = useFetch<Movie[]>(URL_RANDOM_MOVIES);
 
   const {
     data: loadedHistory,
@@ -39,6 +39,7 @@ function App() {
   const error = errorMovies || errorForyou || errorHistory;
   const loading = loadingMovies || loadingForyou || loadingHistory;
 
+  const [search, setSearch] = useState<Movie[]>([]);
   const [history, setHistory] = useState<Movie[]>([]);
   const [foryou, setForyou] = useState<Movie[]>([]);
   const [clicks, setClicks] = useState(0);
@@ -46,6 +47,8 @@ function App() {
   const handlers: Handlers = {
     addMovieToHistory: addMovie(setHistory),
     registerClick: () => setClicks(clicks + 1),
+    searchMovie: async (search: string) =>
+      searchMovie(search).then((movies: Movie[]) => setSearch(movies ?? [])),
   };
 
   useEffect(() => {
@@ -73,12 +76,13 @@ function App() {
       <header>
         <Info title="DCICFLIX" />
         <div>
-          <Search />
+          <Search handlers={handlers} />
           <User />
           <Theme />
         </div>
       </header>
       <main>
+        <Slider title="Search" movies={search ?? []} handlers={handlers} />
         <Slider title="For You" movies={foryou ?? []} handlers={handlers} />
         <Slider title="Upcoming" movies={movies ?? []} handlers={handlers} />
         <Slider title="History" movies={history ?? []} handlers={handlers} />
