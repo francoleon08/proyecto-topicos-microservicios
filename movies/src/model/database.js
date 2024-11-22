@@ -106,4 +106,21 @@ async function getMoviesByFilter(filter, limit) {
     }
 }
 
-module.exports = { getRandomMovies, getMovieById, getMovieByTitle, getMovieByDirector, getMoviesByFilter };
+async function getMoviesByText(text, limit) {
+    const cachedMovies = await getFromCache(text);
+    if (cachedMovies) return cachedMovies;
+
+    const user = await getAuthenticatedUser();
+    if (!user) return null;
+
+    try {
+        const movies = await user.functions.get_movies_by_text(text, limit);
+        await cacheResult(text, movies);
+        return movies;
+    } catch (err) {
+        console.error("Error al obtener película por texto:", err);
+        return null;
+    }
+}
+
+module.exports = { getRandomMovies, getMovieById, getMovieByTitle, getMoviesByText, getMovieByDirector, getMoviesByFilter };
