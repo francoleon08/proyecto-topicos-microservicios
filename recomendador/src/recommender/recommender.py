@@ -15,29 +15,29 @@ def query_filter_endpoint(filters, limit=1000):
     try:
         url = f"http://movies:3000/movies/filter?limit={limit}"
         headers = {"Content-Type": "application/json"}
-        response = requests.post(url, json=filters, headers=headers)
-        response.raise_for_status()
-        movies = response.json()
+        current_filters = filters.copy()  
+        
+        filter_removal_priority = ['languages', 'directors', 'cast', 'genres']
+        
+        while current_filters:
+            response = requests.post(url, json=current_filters, headers=headers)
+            response.raise_for_status()
+            movies = response.json()
 
-        if movies:
-            return max(movies, key=lambda x: x.get('rating', 0)) 
-        return None
+            if movies: 
+                return max(movies, key=lambda x: x.get('rating', 0))
+
+            if len(current_filters) > 1: 
+                for filter_key in filter_removal_priority:
+                    if filter_key in current_filters:
+                        del current_filters[filter_key]
+                        break
+            else:
+                break 
+
+        return None 
     except Exception as e:
         print(f"Error querying filter endpoint with filters '{filters}': {e}")
-        return None
-    
-def query_random_movie_endpoint(limit=1):
-    try:
-        url = f"http://movies:3000/movies/random?limit={limit}"
-        response = requests.get(url)
-        response.raise_for_status()
-        movies = response.json()
-
-        if movies:
-            return movies[0]  
-        return None
-    except Exception as e:
-        print(f"Error querying random movie endpoint: {e}")
         return None
 
 def extract_predominant_from_soup(soup):
