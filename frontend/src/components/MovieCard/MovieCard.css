@@ -3,6 +3,7 @@
     user-select: none;
     max-width: 300px;
     max-height: 400px;
+    object-fit: cover;
 }
 
 .card-custom .card-img-top {
