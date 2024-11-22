@@ -81,4 +81,16 @@ router.post('/filter', async (req, res) => {
     }
 });
 
+router.post('/search', async (req, res) => {
+    try {
+        const { text, limit } = req.body;
+        if (!text) return res.status(400).send('Invalid text parameter');
+        if (!limit) return res.status(400).send('Invalid limit parameter');
+        const movies = await Movie.getMoviesByText(text, limit);
+        res.json(movies);
+    } catch (error) {
+        res.status(500).send('Error fetching movies');
+    }
+});
+
 module.exports = router;
