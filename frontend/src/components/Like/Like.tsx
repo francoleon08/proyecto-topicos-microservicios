@@ -11,8 +11,8 @@ function Like({ handleClick }: Props) {
   return (
     <button
       onClick={() => {
+        if (!liked) handleClick();
         setLiked(!liked);
-        if (liked) handleClick();
       }}
     >
       <span>{liked ? "♥" : "♡"}</span>
