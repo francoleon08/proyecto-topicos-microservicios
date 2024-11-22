@@ -4,16 +4,24 @@ import requests
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from collections import Counter
+from dotenv import load_dotenv
+import os
 import warnings
 
 warnings.filterwarnings('ignore')
+load_dotenv()
+
+URL_MOVIES = os.getenv('URL_MOVIES')
 
 def clean_genres(genres):
-    return ', '.join(str.lower(i.replace(" ", "")) for i in genres.split(', '))
+    if not genres:
+        return ""
+    return ', '.join(str(i.lower().replace(" ", "")) for i in genres)
+
 
 def query_filter_endpoint(filters, limit=1000):
     try:
-        url = f"http://movies:3000/movies/filter?limit={limit}"
+        url = URL_MOVIES + f"/movies/filter?limit={limit}"
         headers = {"Content-Type": "application/json"}
         current_filters = filters.copy()  
         
@@ -52,7 +60,7 @@ def extract_predominant_from_soup(soup):
     return predominant_genre, predominant_cast, predominant_director, predominant_language
 
 def process_recommendations(movie_history_data):
-    movie_history = pd.DataFrame(movie_history_data)
+    movie_history = pd.DataFrame(movie_history_data)              
 
     movie_history['genres_clean'] = movie_history['genres'].apply(clean_genres)
     genres_list = movie_history['genres_clean'].apply(lambda x: x.split(', ')).tolist()

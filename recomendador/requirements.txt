@@ -5,3 +5,6 @@ pandas
 numpy
 scikit-learn
 matplotlib
+pika
+python-dotenv
+aiohttp
