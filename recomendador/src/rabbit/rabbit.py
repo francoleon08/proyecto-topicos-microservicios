@@ -4,7 +4,7 @@ import json
 
 RABBITMQ_URL = 'amqp://rabbitmq:5672'
 MOVIES_QUEUE = 'movies'
-RECOMMENDATIONS_QUEUE = 'recommendations'
+RECOMMENDATIONS_QUEUE = 'recommendation'
 
 def get_rabbitmq_channel():
     connection = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
@@ -31,11 +31,11 @@ def fetch_movie_history_from_queue():
         print(f"Error fetching movie history from queue: {e}")
         return []
 
-def send_recommendations_to_rabbitmq(recommendations):
+def send_recommendations_to_rabbitmq(recommendation):
     try:
         channel = get_rabbitmq_channel()
         result_message = json.dumps({
-            'recommendations': recommendations
+            'recommendation': recommendation
         })
         channel.basic_publish(
             exchange='',
@@ -45,7 +45,7 @@ def send_recommendations_to_rabbitmq(recommendations):
                 delivery_mode=2  
             )
         )
-        print("Sent recommendations to RECOMMENDATIONS_QUEUE")
+        print("Sent recommendation to RECOMMENDATIONS_QUEUE")
     except Exception as e:
         print(f"Error sending recommendations to RabbitMQ: {e}")
         raise

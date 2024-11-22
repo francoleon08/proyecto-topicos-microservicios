@@ -40,12 +40,9 @@ def query_random_movie_endpoint(limit=1):
         print(f"Error querying random movie endpoint: {e}")
         return None
 
-def extract_predominant_from_soup(soup, valid_genres, valid_cast, valid_directors, valid_languages):
+def extract_predominant_from_soup(soup):
     tokens = soup.split()
-    genre_counts = Counter([token for token in tokens if token in valid_genres])
-    cast_counts = Counter([token for token in tokens if token in valid_cast])
-    director_counts = Counter([token for token in tokens if token in valid_directors])
-    language_counts = Counter([token for token in tokens if token in valid_languages])
+    token_counts = Counter(tokens)
 
     predominant_genre = genre_counts.most_common(1)[0][0] if genre_counts else None
     predominant_cast = cast_counts.most_common(1)[0][0] if cast_counts else None
@@ -54,11 +51,10 @@ def extract_predominant_from_soup(soup, valid_genres, valid_cast, valid_director
 
     return predominant_genre, predominant_cast, predominant_director, predominant_language
 
-def process_recommendations(movie_history_data, valid_genres, valid_cast, valid_directors, valid_languages):
+def process_recommendations(movie_history_data):
     movie_history = pd.DataFrame(movie_history_data)
 
     movie_history['genres_clean'] = movie_history['genres'].apply(clean_genres)
-  
     genres_list = movie_history['genres_clean'].apply(lambda x: x.split(', ')).tolist()
     cast_list = movie_history['cast'].apply(lambda x: x.split(', ') if isinstance(x, str) else []).tolist()
     directors_list = movie_history['directors'].apply(lambda x: x.split(', ') if isinstance(x, str) else []).tolist()
@@ -75,9 +71,11 @@ def process_recommendations(movie_history_data, valid_genres, valid_cast, valid_
         axis=1
     )
 
-    predominant_features = movie_history['soup'].apply(
-        lambda x: extract_predominant_from_soup(x, valid_genres, valid_cast, valid_directors, valid_languages)
+    movie_history['filtered_soup'] = movie_history['soup'].apply(
+        lambda x: ' '.join([token for token in x.split() if token in valid_tokens])
     )
+    
+    predominant_features = movie_history['filtered_soup'].apply(extract_predominant_from_soup)
 
     predominant_genres, predominant_cast, predominant_directors, predominant_languages = zip(*predominant_features)
 
