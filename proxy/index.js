@@ -36,7 +36,7 @@ app.post("/movie/viewed", (req, res) => {
 
 app.get("/movie/recommendation", async (req, res) => {
   const movie = movies.shift();
-  res.json(movie);
+  res.json(movie??{});
 });
 
 function send_movie(movie) {
@@ -44,7 +44,7 @@ function send_movie(movie) {
   const message = JSON.stringify(movie);
   channel.assertQueue(queue, { durable: true });
   channel.sendToQueue(queue, Buffer.from(message));
-  console.log(`[x] Sent a message to ${queue}`);
+  console.log(`[x] Sent a message to queue: ${queue}`);
 }
 
 function consume_movies() {
@@ -57,6 +57,7 @@ function consume_movies() {
         const content = message.content.toString();
         const movie = JSON.parse(content);
         movies.push(movie);
+        console.log(`[x] Received a message from queue: ${queue}`);
       }
     },
     { noAck: true },
