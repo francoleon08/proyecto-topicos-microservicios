@@ -1,10 +1,24 @@
+import { Handlers } from "../../types/Handlers.ts";
 import "./Search.css";
 
-function Search() {
+interface Props {
+  handlers: Handlers;
+}
+
+function Search({ handlers }: Props) {
+  const handleKeyPress = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const search = event.target.value;
+    handlers.searchMovie(search);
+  };
+
   return (
     <search id="searchbar">
       <span id="icon">&#9906;</span>
-      <input id="input" placeholder="Search for a Movie" />
+      <input
+        onChange={handleKeyPress}
+        id="input"
+        placeholder="Search for a Movie"
+      />
     </search>
   );
 }
