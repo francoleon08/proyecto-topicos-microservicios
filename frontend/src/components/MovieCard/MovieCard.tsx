@@ -1,5 +1,5 @@
+import { useState } from "react";
 import { Card } from "react-bootstrap";
-import placeholder from "../../assets/images/placeholder.jpg";
 import Like from "../Like/Like.tsx";
 import { Movie } from "../../types/Movie.ts";
 import { Handlers } from "../../types/Handlers.ts";
@@ -12,6 +12,8 @@ interface Props {
 }
 
 function MovieCard({ movie, handlers }: Props) {
+  const [visible, setVisible] = useState(true);
+
   const handleClick = () => {
     handlers.addMovieToHistory(movie);
     handlers.registerClick(movie);
@@ -19,13 +21,12 @@ function MovieCard({ movie, handlers }: Props) {
     registerLike(movie);
   };
 
+  if (!visible) return null;
+  hasPoster(movie.poster).then((has) => setVisible(has));
+
   return (
     <Card className="card-custom">
-      <Card.Img
-        variant="top"
-        src={movie.poster || placeholder}
-        alt={movie.title}
-      />
+      <Card.Img variant="top" src={movie.poster} alt={movie.title} />
       <Card.Body>
         <Card.Title className="card-title">{movie.title}</Card.Title>
         <Card.Text className="card-text">{movie.plot}</Card.Text>
@@ -36,3 +37,13 @@ function MovieCard({ movie, handlers }: Props) {
 }
 
 export default MovieCard;
+
+async function hasPoster(poster: string | null) {
+  if (!poster) return false;
+  try {
+    const response = await fetch(poster, { method: "HEAD" });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
