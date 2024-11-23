@@ -81,8 +81,10 @@ services:
     ports:
       - "80:80"
     depends_on:
+      - movies
       - random-movies
       - history
+      - proxy
     networks:
       - general
 
