@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import Like from "../Like/Like.tsx";
 import { Movie } from "../../types/Movie.ts";
 import { Handlers } from "../../types/Handlers.ts";
 import { addToHistory, registerLike } from "./MovieService.ts";
 import "./MovieCard.css";
+
+const IMAGE_SIZE = { width: 300, height: 400 };
 
 interface Props {
   movie: Movie;
@@ -20,6 +22,22 @@ function MovieCard({ movie, handlers }: Props) {
     addToHistory(movie);
     registerLike(movie);
   };
+
+  useEffect(() => {
+    hasPoster(movie.poster).then((has) => {
+      if (!has) setVisible(false);
+      else {
+        const img = new Image();
+        img.onload = () => {
+          setVisible(
+            img.width >= IMAGE_SIZE.width && img.height >= IMAGE_SIZE.height,
+          );
+        };
+        img.onerror = () => setVisible(false);
+        img.src = movie.poster;
+      }
+    });
+  }, [movie.poster]);
 
   if (!visible) return null;
   hasPoster(movie.poster).then((has) => setVisible(has));
