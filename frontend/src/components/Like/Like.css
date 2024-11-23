@@ -1,10 +1,13 @@
-button {
+.like {
     border: none;
     background: none;
     max-width: fit-content;
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }
 
-button span {
+.like span {
     color: red;
     font-size: 3em;
 }
