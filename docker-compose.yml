@@ -75,7 +75,6 @@ services:
       - "3002:3000"
     environment:
       - PORT=3000
-      - RANDOM_MOVIES_URL=http://random-movies:3000
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - RABBITMQ_MOVIES_QUEUE=movies
       - RABBITMQ_RECOMMENDATIONS_QUEUE=recommendation
