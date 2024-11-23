@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
+import Stars from "../Stars/Stars.tsx";
 import Like from "../Like/Like.tsx";
 import { Movie } from "../../types/Movie.ts";
 import { Handlers } from "../../types/Handlers.ts";
@@ -48,6 +49,7 @@ function MovieCard({ movie, handlers }: Props) {
       <Card.Body>
         <Card.Title className="card-title">{movie.title}</Card.Title>
         <Card.Text className="card-text">{movie.plot}</Card.Text>
+        <Stars rating={movie.imdb.rating} />
         <Like handleClick={handleClick} />
       </Card.Body>
     </Card>

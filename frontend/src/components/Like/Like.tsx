@@ -10,6 +10,7 @@ function Like({ handleClick }: Props) {
 
   return (
     <button
+      className="like"
       onClick={() => {
         if (!liked) handleClick();
         setLiked(!liked);
