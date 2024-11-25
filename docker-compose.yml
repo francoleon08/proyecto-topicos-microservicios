@@ -12,6 +12,8 @@ services:
       - PORT=3000
       - MONGODB_APP_ID=application-mflix-yqrpksi
       - REDIS_URL=redis://redis:6379
+    ports:
+      - "3000:3000" # Se exponen los puertos de rabbitmq solo para test, luego se ocultan
     networks:
       - cache-tier
       - general
@@ -66,24 +68,24 @@ services:
       - rabbit-tier
       - general
 
-  recommendation:
-    image: recommender-image
-    build:
-      context: ./recomendador
-      dockerfile: Dockerfile
-    ports:
-      - "8090:8080" # Se exponen los puertos de recommendation solo para test, luego se ocultan
-    environment:
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_PORT=5672
-      - SPRING_RABBITMQ_USERNAME=admin
-      - SPRING_RABBITMQ_PASSWORD=admin
-    depends_on: 
-      - rabbitmq
-      - movies
-    networks:
-      - rabbit-tier
-      - general
+  #recommendation:
+  #  image: recommender-image
+  #  build:
+  #    context: ./recomendador
+  #    dockerfile: Dockerfile
+  #  ports:
+  #    - "8090:8080" # Se exponen los puertos de recommendation solo para test, luego se ocultan
+  #  environment:
+  #    - SPRING_RABBITMQ_HOST=rabbitmq
+  #    - SPRING_RABBITMQ_PORT=5672
+  #    - SPRING_RABBITMQ_USERNAME=admin
+  #    - SPRING_RABBITMQ_PASSWORD=admin
+  #  depends_on: 
+  #    - rabbitmq
+  #    - movies
+  #  networks:
+  #    - rabbit-tier
+  #    - general
 
 networks:
   cache-tier:
