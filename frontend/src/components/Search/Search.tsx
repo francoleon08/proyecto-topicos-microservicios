@@ -8,7 +8,7 @@ interface Props {
 function Search({ handlers }: Props) {
   const handleKeyPress = (event: React.ChangeEvent<HTMLInputElement>) => {
     const search = event.target.value;
-    handlers.searchMovie(search);
+    if (search) handlers.searchMovie(search);
   };
 
   return (
