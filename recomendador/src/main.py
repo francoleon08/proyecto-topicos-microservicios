@@ -9,190 +9,214 @@ app = Flask(__name__)
 
 movies = [
     {
-        "_id": "573a1398f29313caabcea92f",
-        "plot": "The supposed true story of Shirley MacClaine's experience with a spiritual awakening.",
+        "_id": "573a139bf29313caabcf5017",
+        "countries": [
+            "France",
+            "Iceland",
+            "Sweden"
+        ],
         "genres": [
-            "Biography",
-            "Drama"
+            "Drama",
+            "History"
         ],
-        "runtime": 235,
+        "runtime": 122,
         "cast": [
-            "Shirley MacLaine",
-            "Charles Dance",
-            "John Heard",
-            "Anne Jackson"
+            "Tinna Gunnlaugsdèttir",
+            "Pierre Vaneck",
+            "Sigursteinn Brynjèlfsson",
+            "Christian Charmetant"
         ],
-        "num_mflix_comments": 0,
-        "poster": "https://m.media-amazon.com/images/M/MV5BMTU2MTEzODQ2M15BMl5BanBnXkFtZTcwNTgzNzAyMQ@@._V1_SY1000_SX677_AL_.jpg",
-        "title": "Out on a Limb",
-        "fullplot": "Shirley MacLaine plays herself in this TV mini-series based on her autobiographical best-seller which delves into her new age beliefs and its effects on her personal and public lives. John Heard portrays a composite role of her many spiritual and personal advisors.",
+        "num_mflix_comments": 1,
+        "title": "As in Heaven",
+        "lastupdated": "2015-08-29 23:54:01.257000000",
+        "languages": [
+            "Icelandic",
+            "French"
+        ],
+        "released": "1992-08-29T00:00:00.000Z",
+        "directors": [
+            "Kristèn Jèhannesdèttir"
+        ],
+        "writers": [
+            "Kristèn Jèhannesdèttir"
+        ],
+        "awards": {
+            "wins": 2,
+            "nominations": 1,
+            "text": "2 wins & 1 nomination."
+        },
+        "year": 1992,
+        "imdb": {
+            "rating": 7.1,
+            "votes": 41,
+            "id": 105504
+        },
+        "type": "movie"
+    },
+    {
+        "_id": "573a13a8f29313caabd1c771",
+        "plot": "An exuberant, sharply satirical comedy about two parentally neglected teenagers who find the courage to believe in themselves",
+        "genres": [
+            "Comedy"
+        ],
+        "runtime": 89,
+        "metacritic": 63,
+        "cast": [
+            "Jordan Brooking",
+            "Ben Lee",
+            "Rose Byrne",
+            "Miranda Richardson"
+        ],
+        "num_mflix_comments": 1,
+        "poster": "https://m.media-amazon.com/images/M/MV5BMTI4Njg1MTA2M15BMl5BanBnXkFtZTcwODIwODc0MQ@@._V1_SY1000_SX677_AL_.jpg",
+        "title": "The Rage in Placid Lake",
+        "fullplot": "Precocious, bohemian teenager Placid Lake, finishes high school and decides to do the one thing that will annoy his new age parents the most--go straight! With a few weeks spent reading a library of self-help manuals, Placid has it all sorted out--and he has the haircut and the cheap suit to prove it. Can Placid Lake retire his rage in the pursuit of beige; embrace conformity and leap on the fast track to corporate success. Will his 'brainiac' friend Gemma be able to talk him out of this economic rationalist madness? And will poor Doug and Sylvia survive the ignominy of having a son with a burgeoning future in insurance? Never underestimate the evil of banality.",
         "languages": [
             "English"
         ],
-        "released": "1987-01-18T00:00:00.000Z",
-        "awards": {
-            "wins": 0,
-            "nominations": 4,
-            "text": "Nominated for 1 Golden Globe. Another 3 nominations."
-        },
-        "lastupdated": "2015-07-23 00:30:21.850000000",
-        "year": 1987,
-        "imdb": {
-            "rating": 7.2,
-            "votes": 353,
-            "id": 93688
-        },
-        "countries": [
-            "USA"
-        ],
-        "type": "series",
-        "tomatoes": {
-            "viewer": {
-                "rating": 3.8,
-                "numReviews": 20,
-                "meter": 71
-            },
-            "dvd": "1992-11-04T00:00:00.000Z",
-            "lastUpdated": "2015-06-24T19:12:31.000Z"
-        }
-    },
-    {
-        "_id": "573a1393f29313caabcdcf84",
-        "plot": "Sara and Kurt Muller and their three children are returning to her mother's home in Washington DC after 18 years in Europe. A Romanian Count living there discovers Kurt's attache case full ...",
-        "genres": [
-            "Drama"
-        ],
-        "runtime": 114,
-        "rated": "APPROVED",
-        "cast": [
-            "Bette Davis",
-            "Paul Lukas",
-            "Geraldine Fitzgerald",
-            "Lucile Watson"
-        ],
-        "num_mflix_comments": 0,
-        "poster": "https://m.media-amazon.com/images/M/MV5BM2ZmMDhjNmQtN2MxNy00MTdmLTg4MTEtZTVkMTFmZDg0NTNlXkEyXkFqcGdeQXVyMDI2NDg0NQ@@._V1_SY1000_SX677_AL_.jpg",
-        "title": "Watch on the Rhine",
-        "fullplot": "Sara and Kurt Muller and their three children are returning to her mother's home in Washington DC after 18 years in Europe. A Romanian Count living there discovers Kurt's attache case full of money. He also finds out from friends at the German Embassy that Kurt is working with an anti-Nazi underground group in Germany. He tries to blackmail Kurt. Kurt shoots him and must flee. When Sara hears no more of Kurt, she knows that her oldest son Joshua will soon leave to work in the underground.",
-        "languages": [
-            "English",
-            "German"
-        ],
-        "released": "1943-08-27T00:00:00.000Z",
+        "released": "2003-08-28T00:00:00.000Z",
         "directors": [
-            "Herman Shumlin",
-            "Hal Mohr"
+            "Tony McNamara"
         ],
         "writers": [
-            "Dashiell Hammett (screen play)",
-            "Lillian Hellman (additional scenes and dialogue)",
-            "Lillian Hellman (from the stage play by)"
+            "Tony McNamara"
         ],
         "awards": {
-            "wins": 5,
-            "nominations": 3,
-            "text": "Won 1 Oscar. Another 4 wins & 3 nominations."
+            "wins": 4,
+            "nominations": 12,
+            "text": "4 wins & 12 nominations."
         },
-        "lastupdated": "2015-08-18 00:26:01.173000000",
-        "year": 1943,
-        "imdb": {
-            "rating": 7.5,
-            "votes": 2510,
-            "id": 36515
-        },
-        "countries": [
-            "USA"
-        ],
-        "type": "movie",
-        "tomatoes": {
-            "viewer": {
-                "rating": 3.6,
-                "numReviews": 564,
-                "meter": 63
-            },
-            "dvd": "2008-04-01T00:00:00.000Z",
-            "critic": {
-                "rating": 6.8,
-                "numReviews": 5,
-                "meter": 80
-            },
-            "lastUpdated": "2015-09-10T19:15:55.000Z",
-            "rotten": 1,
-            "production": "Warner Home Video",
-            "fresh": 4
-        }
-    },
-    {
-        "_id": "573a13b1f29313caabd36bd7",
-        "fullplot": "Anthony \"Swoff\" Swofford, a Camus-reading kid from Sacramento, enlists in the Marines in the late 1980s. He malingers during boot camp, but makes it through as a sniper, paired with the usually-reliable Troy. The Gulf War breaks out, and his unit goes to Saudi Arabia for Desert Shield. After 175 days of boredom, adrenaline, heat, worry about his girlfriend finding someone else, losing it and nearly killing a mate, demotion, latrine cleaning, faulty gas masks, and desert football, Desert Storm begins. In less than five days, it's over, but not before Swoff sees burned bodies, flaming oil derricks, an oil-drenched horse, and maybe a chance at killing. Where does all the testosterone go?",
+        "lastupdated": "2015-08-30 00:27:10.040000000",
+        "year": 2003,
         "imdb": {
             "rating": 7.1,
-            "votes": 133309,
-            "id": 418763
+            "votes": 2479,
+            "id": 305999
         },
-        "year": 2005,
-        "plot": "Based on former Marine Anthony Swofford's best-selling 2003 book about his pre-Desert Storm experiences in Saudi Arabia and about his experiences fighting in Kuwait.",
-        "genres": [
-            "Drama",
-            "War"
-        ],
-        "rated": "R",
-        "metacritic": 58,
-        "title": "Jarhead",
-        "lastupdated": "2015-08-25 00:09:40.870000000",
-        "languages": [
-            "English",
-            "Spanish",
-            "Arabic",
-            "Latin"
-        ],
-        "writers": [
-            "William Broyles Jr. (screenplay)",
-            "Anthony Swofford (book)"
+        "countries": [
+            "Australia"
         ],
         "type": "movie",
         "tomatoes": {
-            "website": "http://www.jarheadmovie.com/",
+            "website": "http://www.filmmovement.com/FilmDetail.aspx?ProductID=0504",
             "viewer": {
-                "rating": 3.3,
-                "numReviews": 391985,
-                "meter": 68
+                "rating": 3.7,
+                "numReviews": 5479,
+                "meter": 79
             },
-            "dvd": "2006-03-07T00:00:00.000Z",
+            "dvd": "2006-04-18T00:00:00.000Z",
             "critic": {
-                "rating": 6.4,
-                "numReviews": 196,
-                "meter": 61
+                "rating": 6.1,
+                "numReviews": 15,
+                "meter": 53
             },
-            "boxOffice": "$62.6M",
-            "consensus": "This first person account of the first Gulf War scores with its performances and cinematography but lacks an emotional thrust.",
-            "rotten": 76,
-            "production": "Universal Pictures",
-            "lastUpdated": "2015-09-15T20:09:50.000Z",
-            "fresh": 120
-        },
-        "poster": "https://m.media-amazon.com/images/M/MV5BYmMyNGM4NWItYjgwYS00N2Q2LWJmY2YtY2ViNWYwMzRhODlmXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SY1000_SX677_AL_.jpg",
-        "num_mflix_comments": 0,
-        "released": "2005-11-04T00:00:00.000Z",
+            "lastUpdated": "2015-09-14T19:59:52.000Z",
+            "rotten": 7,
+            "production": "Film Movement",
+            "fresh": 8
+        }
+    },
+    {
+        "_id": "573a13ccf29313caabd831f3",
+        "plot": "A drama about a woman who seems able to overcome everything for freedom, except for her past mistakes.",
+        "genres": [
+            "Action",
+            "Drama"
+        ],
+        "runtime": 87,
+        "cast": [
+            "Ana Ularu",
+            "Andi Vasluianu",
+            "Ioana Flora",
+            "Mimi Branescu"
+        ],
+        "poster": "https://m.media-amazon.com/images/M/MV5BM2RlOWQ4Y2YtYjVkOS00OTk3LTkzYzktYTcyNzllYjhlYWE2XkEyXkFqcGdeQXVyNDkzNTM2ODg@._V1_SY1000_SX677_AL_.jpg",
+        "title": "Outbound",
+        "fullplot": "After two years in prison, Matilda is granted a 24-hour temporary release. Not willing to return, she plans to escape, flee the country and start afresh. But before the day is over, Matilda must reconnect with her troubled past - the family who rejected her, her estranged ex-lover and, most of all, the kid she left behind. The struggle for a new life reminds her that freedom may be just one choice away.",
+        "languages": [
+            "Romanian"
+        ],
+        "released": "2011-03-24T00:00:00.000Z",
+        "directors": [
+            "Bogdan George Apetri"
+        ],
+        "writers": [
+            "Bogdan George Apetri (screenplay)",
+            "Cristian Mungiu (story)",
+            "Ioana Uricaru (story)",
+            "Tudor Voican (screenplay)"
+        ],
         "awards": {
-            "wins": 5,
-            "nominations": 11,
-            "text": "5 wins & 11 nominations."
+            "wins": 20,
+            "nominations": 10,
+            "text": "20 wins & 10 nominations."
+        },
+        "lastupdated": "2015-08-15 00:47:43.753000000",
+        "year": 2010,
+        "imdb": {
+            "rating": 6.7,
+            "votes": 616,
+            "id": 1646221
         },
         "countries": [
-            "Germany",
-            "USA"
+            "Romania",
+            "Austria"
         ],
+        "type": "movie",
+        "num_mflix_comments": 0
+    },
+    {
+        "_id": "573a13d3f29313caabd943da",
+        "plot": "The story is about the world of a small family with familiar dreams and not so remarkable problems. The mother is trying to lead everything to save her family, but small events disarrange all her plans.",
+        "genres": [
+            "Drama",
+            "Family"
+        ],
+        "runtime": 100,
         "cast": [
-            "Jake Gyllenhaal",
-            "Scott MacDonald",
-            "Peter Sarsgaard",
-            "Jamie Foxx"
+            "Saber Abbar",
+            "Negar Javaherian",
+            "Fatemah Motamed-Aria",
+            "Parsa Pirouzfar"
         ],
+        "num_mflix_comments": 0,
+        "poster": "https://m.media-amazon.com/images/M/MV5BMTU3MTk5OTkzMV5BMl5BanBnXkFtZTcwMDI1NjIzNw@@._V1_SY1000_SX677_AL_.jpg",
+        "title": "Here Without Me",
+        "fullplot": "The story is about the world of a small family with familiar dreams and not so remarkable problems. The mother is trying to lead everything to save her family, but small events disarrange all her plans.",
+        "languages": [
+            "Persian"
+        ],
+        "released": "2012-03-23T00:00:00.000Z",
         "directors": [
-            "Sam Mendes"
+            "Bahram Tavakoli"
         ],
-        "runtime": 125
+        "writers": [
+            "Bahram Tavakoli",
+            "Tennessee Williams (play)"
+        ],
+        "awards": {
+            "wins": 1,
+            "nominations": 1,
+            "text": "1 win & 1 nomination."
+        },
+        "lastupdated": "2015-07-28 00:29:29.420000000",
+        "year": 2011,
+        "imdb": {
+            "rating": 8.1,
+            "votes": 2832,
+            "id": 1874522
+        },
+        "countries": [
+            "Iran"
+        ],
+        "type": "movie",
+        "tomatoes": {
+            "viewer": {
+                "rating": 3.9,
+                "numReviews": 22
+            },
+            "lastUpdated": "2015-06-25T20:25:26.000Z"
+        }
     }
 ]
 

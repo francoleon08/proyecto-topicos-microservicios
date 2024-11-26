@@ -1,4 +1,4 @@
-version: '3.8'
+#version: '3.8'
 
 services:
   movies:
@@ -68,24 +68,27 @@ services:
       - rabbit-tier
       - general
 
-  #recommendation:
-  #  image: recommender-image
-  #  build:
-  #    context: ./recomendador
-  #    dockerfile: Dockerfile
-  #  ports:
-  #    - "8090:8080" # Se exponen los puertos de recommendation solo para test, luego se ocultan
-  #  environment:
-  #    - SPRING_RABBITMQ_HOST=rabbitmq
-  #    - SPRING_RABBITMQ_PORT=5672
-  #    - SPRING_RABBITMQ_USERNAME=admin
-  #    - SPRING_RABBITMQ_PASSWORD=admin
-  #  depends_on: 
-  #    - rabbitmq
-  #    - movies
-  #  networks:
-  #    - rabbit-tier
-  #    - general
+  recommendation:
+    image: recommender-image
+    build:
+      context: ./recomendador
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000" 
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin
+    env_file:
+      - ./recomendador/.env
+    depends_on: 
+      - history
+      - rabbitmq
+      - movies
+    networks:
+      - rabbit-tier
+      - general
 
 networks:
   cache-tier:

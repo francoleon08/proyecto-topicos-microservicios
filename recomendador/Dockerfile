@@ -1,13 +1,19 @@
 FROM python:3.9-slim
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/recomendador
 
 COPY . .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install virtualenv
 
-EXPOSE 8080
+RUN virtualenv venv
 
-ENV NAME World
+RUN . venv/bin/activate && pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "main.py"]
+COPY .env .env
+
+EXPOSE 5000
+
+ENV NAME .env
+
+CMD ["venv/bin/gunicorn", "-b", "0.0.0.0:5000", "src.main:app", "--reload"]

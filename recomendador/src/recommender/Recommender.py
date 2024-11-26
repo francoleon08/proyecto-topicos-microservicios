@@ -13,18 +13,18 @@ import re
 warnings.filterwarnings('ignore')
 load_dotenv()
 
-URL_MOVIES = os.getenv('URL_MOVIES')
+URL_MOVIES = f"{os.getenv('URL_MOVIES')}/movies/random?limit=1000"
 
-def clean_genres(genres):
-    if not genres:
+def clean(clean):
+    if not clean or not isinstance(clean, list):
         return ""
-    return ', '.join(str(i.lower().replace(" ", "")) for i in genres)
+    return ', '.join(str(i.lower().replace(" ", "")) for i in clean)
 
 def query_random_movie_endpoint(limit=1):
     try:
-        #url = f"http://localhost:3000/movies/random?limit={limit}"
-        url = f"http://localhost:3000/movies/filter?limit={limit}&timestamp={int(time.time())}"
-        response = requests.get(url)
+        #base_url = os.getenv('URL_MOVIES')  
+        #url = f"{base_url}/movies/random?limit={limit}"
+        response = requests.get(URL_MOVIES)
         response.raise_for_status()
         movies = response.json()
 
@@ -38,14 +38,14 @@ def query_random_movie_endpoint(limit=1):
 def query_filter_endpoint(filters, limit=1000):
     try:
         #url = URL_MOVIES + f"/movies/filter?limit={limit}"
-        url = f"http://localhost:3000/movies/filter?limit={limit}&timestamp={int(time.time())}"
+        url = f"http://localhost:3000/movies/filter?limit={limit}"#&timestamp={int(time.time())}
         headers = {"Content-Type": "application/json"}
         current_filters = filters.copy()  
         
         filter_removal_priority = ['languages', 'directors', 'cast', 'genres']
         
         while current_filters:
-            response = requests.post(url, json=current_filters, headers=headers)
+            response = requests.post(URL_MOVIES, json=current_filters, headers=headers)
             response.raise_for_status()
             movies = response.json()
 
@@ -64,111 +64,172 @@ def query_filter_endpoint(filters, limit=1000):
     except Exception as e:
         print(f"Error querying filter endpoint with filters '{filters}': {e}")
         return None
-
-def extract_predominant(movies):
-    """
-    Extracts the predominant values for the predefined fields from the movies data.
-    Fields include: genres, cast, directors, and languages.
     
-    :param movies: List of dictionaries representing movies.
-    :return: Dictionary of predominant values for predefined fields.
-    """
-    # Constant fields to process
-    fields = ["genres", "cast", "directors", "languages"]
+def query_filter(filters, limit=1000):
+    try:
+        # Define the URL and headers
+        url = f"http://localhost:3000/movies/filter?limit={limit}"#&timestamp={int(time.time())}
+        headers = {"Content-Type": "application/json"}
+
+        # Priority for removing filters
+        filter_removal_priority = ["language", "director", "cast", "genre"]
+
+        # Initialize variables
+        best_movie = None
+        best_match_score = 0
+        current_filters = filters.copy()  # Start with all filters intact
+
+        while current_filters:
+            # Create the query payload by removing the prefix from each filter value
+            query_payload = {
+                key: value.split(":", 1)[1]  # Extract the value after the first colon
+                for key, value in current_filters.items()
+            }
+
+            print(f"Trying with filters: {query_payload}")  # Debugging log
+
+            # Send the request to the endpoint
+            response = requests.post(URL_MOVIES, json=query_payload, headers=headers)
+            response.raise_for_status()
+            movies = response.json()
+
+            if movies:
+                for movie in movies:
+                    # Calculate match score based on how many filters the movie satisfies
+                    match_score = sum(
+                        query_payload.get(key, "").lower() in str(movie.get(key, "")).lower()
+                        for key in query_payload
+                    )
+
+                    # Update the best movie if this one has a higher score or rating
+                    imdb_rating = float(movie.get("imdb", {}).get("rating", 0) or 0)
+                    if (match_score > best_match_score) or (
+                        match_score == best_match_score and imdb_rating > float(best_movie.get("imdb", {}).get("rating", 0) or 0)
+                    ):
+                        best_movie = movie
+                        best_match_score = match_score
+
+                # Stop searching if a movie matches all filters
+                if best_match_score == len(query_payload):
+                    return {"best_movie": best_movie, "best_filters": current_filters}
+
+            # If no movies match or no perfect match found, remove the least critical filter
+            if len(current_filters) > 1:
+                for filter_key in filter_removal_priority:
+                    if filter_key in current_filters:
+                        del current_filters[filter_key]
+                        break
+            else:
+                break
+
+        # Return the best movie found, or None if no matches
+        return {"best_movie": best_movie, "best_filters": current_filters if best_movie else {}}
+
+    except Exception as e:
+        print(f"Error querying filter endpoint with filters '{filters}': {e}")
+        return {"best_movie": None, "best_filters": None}
     
-    results = {}
+def get_best_rated_movie_from_url(filters, limit=1):
+    try:
+        base_url = os.getenv('URL_MOVIES') 
+        url = f"{base_url}/movies/random?limit={limit}"
+        headers = {"Content-Type": "application/json"}
+
+        # Sending the filters directly to the backend service
+        response = requests.post(url, json=filters, headers=headers)
+        response.raise_for_status()
+
+        movies = response.json()
+
+        if movies:
+            filtered_movies = [movie for movie in movies if movie.get('imdb', {}).get('rating', 0) > 0]
+
+            best_movie = max(filtered_movies, key=lambda x: x['imdb']['rating'])
+
+            return best_movie
+        else:
+            print("No movies found after applying filters.")
+            return None
+    except Exception as e:
+        print(f"Error fetching best-rated movie: {e}")
+        return None
+
+    best_movie = find_best_movie(filters)
+    if best_movie:
+        return best_movie
+
+    reduced_filters = filters.copy()
+    for key in list(reduced_filters.keys()):
+        reduced_filters.pop(key)
+        best_movie = find_best_movie(reduced_filters)
+        if best_movie:
+            return best_movie
+
+    return None
+
+def extract_predominant_from_soup(soup):
+    tokens = soup.split()
+    token_counts = Counter(tokens)
+
+    genre_counts = Counter([token for token in tokens if token.startswith("genre:")])
+    cast_counts = Counter([token for token in tokens if token.startswith("cast:")])
+    director_counts = Counter([token for token in tokens if token.startswith("director:")])
+    language_counts = Counter([token for token in tokens if token.startswith("language:")])
+
+    predominant_genre = genre_counts.most_common(1)[0][0] if genre_counts else None
+    predominant_cast = cast_counts.most_common(1)[0][0] if cast_counts else None
+    predominant_director = director_counts.most_common(1)[0][0] if director_counts else None
+    predominant_language = language_counts.most_common(1)[0][0] if language_counts else None
+
+    return predominant_genre, predominant_cast, predominant_director, predominant_language
+
+def extract_movie_details(filters):
+    cast_list = filters.get("cast", [])
+    directors_list = filters.get("directors", [])
+    genres_list = filters.get("genres", [])
+    languages_list = filters.get("languages", [])
+
+    predominant_cast = Counter(cast_list).most_common(1)[0][0] if cast_list else None
+    predominant_director = Counter(directors_list).most_common(1)[0][0] if directors_list else None
+    predominant_genre = Counter(genres_list).most_common(1)[0][0] if genres_list else None
+    predominant_language = Counter(languages_list).most_common(1)[0][0] if languages_list else None
+
+    return {
+        "genre": predominant_genre,
+        "cast": predominant_cast,
+        "director": predominant_director,
+        "language": predominant_language
+    }
     
-    for field in fields:
-        field_counter = Counter()
-        
-        # Loop through each movie and process the field
-        for movie in movies:
-            field_data = movie.get(field, None)
-            
-            # Handle lists (e.g., genres, cast) or single values (e.g., language, directors)
-            if isinstance(field_data, list):
-                # Remove prefix like 'genre:', 'cast:', etc. and count the actual values
-                field_counter.update([item.split(':')[-1].lower() for item in field_data if item])  # Get value after ':' and lowercase
-            elif field_data:  # Single values
-                field_counter.update([field_data.lower()])
-        
-        # Find the most common value(s) for the field
-        most_common = field_counter.most_common(1)  # Get the top result
-        results[field] = most_common[0][0] if most_common else None  # Return top or None if empty
-    
-    return results
-
-def extract_movie_details(soup_list):
-    movie_details = []
-
-    # Iterate through the soup list
-    for entry in soup_list:
-        entry = entry.strip()
-        
-        # Regular expressions to extract each component
-        title_match = re.match(r"^(.*?) genre:", entry)
-        genre_match = re.findall(r"genre:([^ ]+)", entry)
-        cast_match = re.findall(r"cast:([^,]+(?:, [^,]+)*)", entry)
-        directors_match = re.findall(r"directors:([^,]+(?:, [^,]+)*)", entry)
-        languages_match = re.findall(r"languages:([^,]+(?:, [^,]+)*)", entry)
-
-
-        # Extract and clean the components
-        title = title_match.group(1).strip() if title_match else "Unknown Title"
-        genres = ', '.join(genre_match)
-        cast = ', '.join(cast_match)
-        directors = ', '.join(directors_match)
-        languages = ', '.join(languages_match)
-
-        # Append the details to the result list
-        movie_details.append({
-            'title': title,
-            'genres': genres,
-            'cast': cast,
-            'directors': directors,
-            'languages': languages
-        })
-    
-    return movie_details
-
 def process_recommendations(movie_history_data):
     movie_history = pd.DataFrame(movie_history_data)              
 
-    movie_history['genres_clean'] = movie_history['genres'].apply(clean_genres)
+    movie_history['genres_clean'] = movie_history['genres'].apply(clean)
     genres_list = movie_history['genres_clean'].apply(lambda x: x.split(', ')).tolist()
-    cast_list = movie_history['cast'].apply(lambda x: x.split(', ') if isinstance(x, str) else []).tolist()
-    directors_list = movie_history['directors'].apply(lambda x: x.split(', ') if isinstance(x, str) else []).tolist()
-    languages_list = movie_history['languages'].apply(lambda x: x.split(', ') if isinstance(x, str) else []).tolist()
+    
+    movie_history['cast_clean'] = movie_history['cast'].apply(clean)
+    cast_list = movie_history['cast_clean'].apply(lambda x: x.split(', ')).tolist()
+    
+    movie_history['directors_clean'] = movie_history['directors'].apply(clean)
+    directors_list = movie_history['directors_clean'].apply(lambda x: x.split(', ')).tolist()
+    
+    movie_history['languages_clean'] = movie_history['languages'].apply(clean)
+    languages_list = movie_history['languages_clean'].apply(lambda x: x.split(', ')).tolist()
 
     movie_history['soup'] = movie_history.apply(
         lambda x: ' '.join([
             str(x['title']),
-            ' '.join([f"genre:{genre}" for genre in genres_list[x.name] if genre]),  # Access genres list directly
-            ' '.join([f"cast:{member}" for member in cast_list[x.name] if member]),  # Access cast list directly
-            ' '.join([f"director:{director}" for director in directors_list[x.name] if director]),  # Access directors list directly
-            ' '.join([f"language:{lang}" for lang in languages_list[x.name] if lang])  # Access languages list directly
+            ' '.join([f"genre:{genre}" for genre in genres_list[x.name] if genre]),  
+            ' '.join([f"cast:{member}" for member in cast_list[x.name] if member]),  
+            ' '.join([f"director:{director}" for director in directors_list[x.name] if director]), 
+            ' '.join([f"language:{lang}" for lang in languages_list[x.name] if lang])  
         ]),
         axis=1
     )
-    
-    #return movie_history['soup'].tolist()      #TEST DONDE ANDA
-    
-    movie_details = extract_movie_details(movie_history['soup'])
-    
-    return movie_details
-    
-    #predominant_features = movie_history['soup'].apply(extract_predominant_from_soup) #aca se rompe
-    
-    predominant_features = extract_predominant(movie_history_data['soup'].tolist())
+ 
+    predominant_features = movie_history['soup'].apply(extract_predominant_from_soup) 
 
     predominant_genres, predominant_cast, predominant_directors, predominant_languages = zip(*predominant_features)
-
-    #filters = {
-    #    "genres": predominant_genres,
-    #    "cast": predominant_cast,
-    #    "directors": predominant_directors,
-    #    "languages": predominant_languages
-    #}
 
     filters = {
         'genres': tuple(g for g in predominant_genres if g),
@@ -177,10 +238,16 @@ def process_recommendations(movie_history_data):
         'languages': tuple(l for l in predominant_languages if l),
     }
     
-    return filters
+    best_filters = extract_movie_details(filters)
     
-    best_movie = query_filter_endpoint(filters)
+    #return best_filters
     
+    #best_movie = query_filter_endpoint(best_filters)
+    
+    #best_movie = query_filter(best_filters)
+    
+    best_movie = get_best_rated_movie_from_url(best_filters, limit=1)
+
     if best_movie:
         return {
             "source_movies": movie_history['title'].tolist(), 
