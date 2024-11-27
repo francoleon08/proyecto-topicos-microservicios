@@ -9,11 +9,12 @@ import os
 import warnings
 import time
 import re
+import json
 
 warnings.filterwarnings('ignore')
 load_dotenv()
 
-URL_MOVIES = f"{os.getenv('URL_MOVIES')}/movies/random?limit=1000"
+URL_MOVIES = os.getenv('URL_MOVIES')
 
 def clean(clean):
     if not clean or not isinstance(clean, list):
@@ -22,9 +23,8 @@ def clean(clean):
 
 def query_random_movie_endpoint(limit=1):
     try:
-        #base_url = os.getenv('URL_MOVIES')  
-        #url = f"{base_url}/movies/random?limit={limit}"
-        response = requests.get(URL_MOVIES)
+        url = f"{URL_MOVIES}/movies/random?limit={limit}"
+        response = requests.get(url)
         response.raise_for_status()
         movies = response.json()
 
@@ -35,137 +35,49 @@ def query_random_movie_endpoint(limit=1):
         print(f"Error querying random movie endpoint: {e}")
         return None
 
-def query_filter_endpoint(filters, limit=1000):
+def query_filter_endpoint(best_genre_json, best_cast_json, best_director_json, best_language_json):
     try:
-        #url = URL_MOVIES + f"/movies/filter?limit={limit}"
-        url = f"http://localhost:3000/movies/filter?limit={limit}"#&timestamp={int(time.time())}
+        limit=1000
+        url = f"{URL_MOVIES}/movies/filter?limit={limit}" 
         headers = {"Content-Type": "application/json"}
-        current_filters = filters.copy()  
-        
-        filter_removal_priority = ['languages', 'directors', 'cast', 'genres']
-        
-        while current_filters:
-            response = requests.post(URL_MOVIES, json=current_filters, headers=headers)
-            response.raise_for_status()
-            movies = response.json()
-
-            if movies: 
-                return max(movies, key=lambda x: float(x.get('imdb', {}).get('rating', 0) or 0))
-
-            if len(current_filters) > 1: 
-                for filter_key in filter_removal_priority:
-                    if filter_key in current_filters:
-                        del current_filters[filter_key]
-                        break
-            else:
-                break 
-
-        return None 
-    except Exception as e:
-        print(f"Error querying filter endpoint with filters '{filters}': {e}")
-        return None
     
-def query_filter(filters, limit=1000):
-    try:
-        # Define the URL and headers
-        url = f"http://localhost:3000/movies/filter?limit={limit}"#&timestamp={int(time.time())}
-        headers = {"Content-Type": "application/json"}
+        response_genre = requests.post(url, body=best_genre_json, headers=headers)
+        response_genre.raise_for_status()  
+        movies_genre = set(response_genre.json())
+        
+        response_cast = requests.post(url, body=best_cast_json, headers=headers)
+        response_cast.raise_for_status()  
+        movies_cast = set(response_cast.json())
+        
+        response_director = requests.post(url, body=best_director_json, headers=headers)
+        response_director.raise_for_status()  
+        movies_director = set(response_director.json())
+        
+        response_language = requests.post(url, body=best_language_json, headers=headers)
+        response_language.raise_for_status()  
+        movies_language = set(response_language.json())
+        
+        top_movies = movies_genre.intersection(movies_cast.intersection(movies_director.intersection(movies_language)))
 
-        # Priority for removing filters
-        filter_removal_priority = ["language", "director", "cast", "genre"]
-
-        # Initialize variables
-        best_movie = None
-        best_match_score = 0
-        current_filters = filters.copy()  # Start with all filters intact
-
-        while current_filters:
-            # Create the query payload by removing the prefix from each filter value
-            query_payload = {
-                key: value.split(":", 1)[1]  # Extract the value after the first colon
-                for key, value in current_filters.items()
-            }
-
-            print(f"Trying with filters: {query_payload}")  # Debugging log
-
-            # Send the request to the endpoint
-            response = requests.post(URL_MOVIES, json=query_payload, headers=headers)
-            response.raise_for_status()
-            movies = response.json()
-
-            if movies:
-                for movie in movies:
-                    # Calculate match score based on how many filters the movie satisfies
-                    match_score = sum(
-                        query_payload.get(key, "").lower() in str(movie.get(key, "")).lower()
-                        for key in query_payload
-                    )
-
-                    # Update the best movie if this one has a higher score or rating
-                    imdb_rating = float(movie.get("imdb", {}).get("rating", 0) or 0)
-                    if (match_score > best_match_score) or (
-                        match_score == best_match_score and imdb_rating > float(best_movie.get("imdb", {}).get("rating", 0) or 0)
-                    ):
-                        best_movie = movie
-                        best_match_score = match_score
-
-                # Stop searching if a movie matches all filters
-                if best_match_score == len(query_payload):
-                    return {"best_movie": best_movie, "best_filters": current_filters}
-
-            # If no movies match or no perfect match found, remove the least critical filter
-            if len(current_filters) > 1:
-                for filter_key in filter_removal_priority:
-                    if filter_key in current_filters:
-                        del current_filters[filter_key]
-                        break
-            else:
-                break
-
-        # Return the best movie found, or None if no matches
-        return {"best_movie": best_movie, "best_filters": current_filters if best_movie else {}}
-
-    except Exception as e:
-        print(f"Error querying filter endpoint with filters '{filters}': {e}")
-        return {"best_movie": None, "best_filters": None}
-    
-def get_best_rated_movie_from_url(filters, limit=1):
-    try:
-        base_url = os.getenv('URL_MOVIES') 
-        url = f"{base_url}/movies/random?limit={limit}"
-        headers = {"Content-Type": "application/json"}
-
-        # Sending the filters directly to the backend service
-        response = requests.post(url, json=filters, headers=headers)
-        response.raise_for_status()
-
-        movies = response.json()
-
-        if movies:
-            filtered_movies = [movie for movie in movies if movie.get('imdb', {}).get('rating', 0) > 0]
-
-            best_movie = max(filtered_movies, key=lambda x: x['imdb']['rating'])
-
+        if top_movies: 
+            best_movie = max(top_movies, key=lambda x: float(x.get('imdb', {}).get('rating', 0) or 0))
             return best_movie
         else:
-            print("No movies found after applying filters.")
-            return None
+            top_movies = movies_genre.intersection(movies_cast.intersection(movies_director))
+            if top_movies:
+                best_movie = max(top_movies, key=lambda x: float(x.get('imdb', {}).get('rating', 0) or 0))
+                return best_movie
+            else:
+                top_movies = movies_genre.intersection(movies_cast)
+                if top_movies:
+                    best_movie = max(top_movies, key=lambda x: float(x.get('imdb', {}).get('rating', 0) or 0))
+                    return best_movie
+
+        return None  
+    
     except Exception as e:
-        print(f"Error fetching best-rated movie: {e}")
+        print(f"Error querying filter endpoint with filters")
         return None
-
-    best_movie = find_best_movie(filters)
-    if best_movie:
-        return best_movie
-
-    reduced_filters = filters.copy()
-    for key in list(reduced_filters.keys()):
-        reduced_filters.pop(key)
-        best_movie = find_best_movie(reduced_filters)
-        if best_movie:
-            return best_movie
-
-    return None
 
 def extract_predominant_from_soup(soup):
     tokens = soup.split()
@@ -183,7 +95,7 @@ def extract_predominant_from_soup(soup):
 
     return predominant_genre, predominant_cast, predominant_director, predominant_language
 
-def extract_movie_details(filters):
+def extract_movie_details(filters, field):
     cast_list = filters.get("cast", [])
     directors_list = filters.get("directors", [])
     genres_list = filters.get("genres", [])
@@ -194,12 +106,17 @@ def extract_movie_details(filters):
     predominant_genre = Counter(genres_list).most_common(1)[0][0] if genres_list else None
     predominant_language = Counter(languages_list).most_common(1)[0][0] if languages_list else None
 
-    return {
-        "genre": predominant_genre,
-        "cast": predominant_cast,
-        "director": predominant_director,
-        "language": predominant_language
-    }
+    if field == 0:
+        return predominant_genre
+    
+    if field == 1:
+        return predominant_cast
+    
+    if field == 2:
+        return predominant_director
+    
+    if field == 3:
+        return predominant_language
     
 def process_recommendations(movie_history_data):
     movie_history = pd.DataFrame(movie_history_data)              
@@ -237,16 +154,32 @@ def process_recommendations(movie_history_data):
         'directors': tuple(d for d in predominant_directors if d),
         'languages': tuple(l for l in predominant_languages if l),
     }
+
+    best_genre = extract_movie_details(filters,0)
+    best_genre_json = json.dumps(best_genre)
     
-    best_filters = extract_movie_details(filters)
+    best_cast = extract_movie_details(filters,1)
+    best_cast_json = json.dumps(best_cast)
+    
+    best_directors = extract_movie_details(filters,2)
+    best_director_json = json.dumps(best_directors)
+    
+    best_languages = extract_movie_details(filters,3)
+    best_languages_json = json.dumps(best_languages)
+
+    best_movie = query_filter_endpoint(best_genre_json,best_cast_json,best_director_json,best_languages_json)
+    
+    return best_movie
+
+    #best_movie_based_on_genre = query_filter_endpoint(best_genre, limit=1000)
+    
+    #return best_movie_based_on_genre
+
+    #best_filters = extract_movie_details(filters)
     
     #return best_filters
-    
-    #best_movie = query_filter_endpoint(best_filters)
-    
-    #best_movie = query_filter(best_filters)
-    
-    best_movie = get_best_rated_movie_from_url(best_filters, limit=1)
+   
+    #best_movie = query_filter_endpoint(best_filters, limit=1000)
 
     if best_movie:
         return {
