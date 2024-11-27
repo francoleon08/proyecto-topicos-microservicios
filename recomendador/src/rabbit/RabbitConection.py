@@ -41,9 +41,8 @@ def callback_movies(ch, method, properties, body):
     process_movie(body)
     
     if len(movies_buffer) >= limit_movies:        
-        recomendation = process_recommendation(movies_buffer)
-        print(recomendation)
-        #send_recomendation(ch, recomendation)
+        recomendation = process_recommendation(movies_buffer)        
+        send_recomendation(ch, recomendation)
         movies_buffer.clear()        
 
 def process_movie(body):
@@ -54,7 +53,15 @@ def process_movie(body):
     movies_buffer.append(movie)
 
 def send_recomendation(channel, message):    
-    message_json = json.dumps(message)
+    recommendation = {
+        "imdb": message["imdb"],
+        "title": message["title"],
+        "poster": message["poster"],
+        "plot": message["plot"],
+        "genres" : message["genres"],
+        "year": message["year"]
+    }
+    message_json = json.dumps(recommendation)
     channel.basic_publish(
         exchange='',
         routing_key=queue_recommendations,
@@ -63,3 +70,4 @@ def send_recomendation(channel, message):
             delivery_mode=2,
         )
     )    
+    print(f"Enviada recomendación: {message['title']}")
