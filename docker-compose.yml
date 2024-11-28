@@ -77,7 +77,7 @@ services:
         - VITE_URL_RANDOM_MOVIES=http://localhost:3000
         - VITE_URL_HISTORY=http://localhost:8080
         - VITE_URL_PROXY=http://localhost:3002
-        - VITE_CLICKS_COUNT=5
+        - VITE_CLICKS_COUNT=1
     ports:
       - "80:80"
     depends_on:
