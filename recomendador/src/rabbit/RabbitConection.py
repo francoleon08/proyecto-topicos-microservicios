@@ -35,8 +35,8 @@ def init_connection():
         except Exception as e:
             print(f"Error inesperado: {e}", file=sys.stderr)
                 
-        print("Reintentando en 5 segundos...")
-        time.sleep(5)
+        print("Reintentando en 1 segundo...")
+        time.sleep(1)
     
 def close_connection():
     global connection
@@ -48,7 +48,7 @@ def consume_movies(channel):
     channel.basic_consume(queue=queue_movies, on_message_callback=callback_movies, auto_ack=True)
     channel.start_consuming()
 
-def callback_movies(ch, method, properties, body):    
+def callback_movies(ch, method, properties, body):        
     global movies_buffer
     
     process_movie(body)
@@ -56,7 +56,7 @@ def callback_movies(ch, method, properties, body):
     if len(movies_buffer) >= limit_movies:        
         recomendation = process_recommendation(movies_buffer)        
         send_recomendation(ch, recomendation)
-        movies_buffer.clear()        
+        movies_buffer.clear()                
 
 def process_movie(body):
     global movies_buffer
@@ -64,6 +64,7 @@ def process_movie(body):
     id_movie = get_id_from_movie(json.loads(body))
     movie = fetch_movie_by_id(id_movie)   
     movies_buffer.append(movie)
+    print(f"Recibida película: {movie['title']}")
 
 def send_recomendation(channel, message):        
     recommendation = {

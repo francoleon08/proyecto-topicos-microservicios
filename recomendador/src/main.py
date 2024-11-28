@@ -1,7 +1,7 @@
 from flask import Flask
-from .rabbit import RabbitConection
+from .rabbit.RabbitConection import init_connection, consume_movies
 
 app = Flask(__name__)
 
-channel = RabbitConection.init_connection()
-RabbitConection.consume_movies(channel)
+channel = init_connection()
+consume_movies(channel)
