@@ -48,7 +48,13 @@ function App() {
     addMovieToHistory: addMovie(setHistory),
     registerClick: () => setClicks(clicks + 1),
     searchMovie: async (search: string) =>
-      searchMovie(search).then((movies: Movie[]) => setSearch(movies ?? [])),
+      searchMovie(search).then((movies: Movie[]) => {
+        const uniqueMovies = movies?.filter(
+          (movie, index, self) =>
+            index === self.findIndex((m) => m.title === movie.title)
+        );
+        setSearch(uniqueMovies ?? []);
+      }),    
   };
 
   useEffect(() => {
