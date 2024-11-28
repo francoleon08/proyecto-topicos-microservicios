@@ -60,28 +60,6 @@ services:
     networks:      
       - general
 
-  recommendation:
-    image: recommender-image
-    build:
-      context: ./recomendador
-      dockerfile: Dockerfile
-    ports:
-      - "5000:5000" 
-    environment:
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_PORT=5672
-      - SPRING_RABBITMQ_USERNAME=admin
-      - SPRING_RABBITMQ_PASSWORD=admin
-    env_file:
-      - ./recomendador/.env
-    depends_on: 
-      - history
-      - rabbitmq
-      - movies
-    networks:
-      - rabbit-tier
-      - general
-      
   frontend:
     image: frontend-image
     build:
