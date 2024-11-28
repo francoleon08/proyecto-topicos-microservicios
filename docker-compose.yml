@@ -13,7 +13,7 @@ services:
     environment:
       - PORT=3000
       - MONGODB_APP_ID=application-mflix-yqrpksi
-      - REDIS_URL=redis://redis:6379    
+      - REDIS_URL=redis://redis:6379
     networks:
       - cache-tier
       - general
@@ -27,11 +27,10 @@ services:
     image: random-movies-image
     build:
       context: ./random-movies
-      dockerfile: Dockerfile   
+      dockerfile: Dockerfile         
     ports:
-      - "3000:3000"
-    environment:
-      - PORT=3000        
+      - "3000:8080"
+    environment:      
       - URL_MOVIES=http://movies:3000
     depends_on:
       - movies
@@ -42,7 +41,7 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"
+      - "5672:5672" # Se exponen los puertos de rabbitmq solo para test, luego se ocultan
       - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: admin
@@ -56,8 +55,11 @@ services:
       context: ./historial
       dockerfile: Dockerfile 
     ports:
-      - "8080:8080"    
-    networks:      
+      - "8080:8080"
+    depends_on: 
+      - rabbitmq
+    networks:
+      - rabbit-tier
       - general
 
   frontend:
@@ -80,7 +82,7 @@ services:
       - proxy
     networks:
       - general
-      
+
   proxy:
     image: proxy-image
     build:

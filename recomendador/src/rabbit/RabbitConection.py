@@ -5,6 +5,7 @@ import pika
 import sys
 import os
 import json
+import time
 
 load_dotenv()
 
@@ -17,22 +18,25 @@ connection = None
 
 movies_buffer = []
 
-def init_connection():    
-    print("Iniciando conexión con RabbitMQ")
+def init_connection():
     global connection
-    try:
-        connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_host))
-        channel = connection.channel()
-        channel.queue_declare(queue=queue_movies, durable=True)
-        channel.queue_declare(queue=queue_recommendations, durable=True)
-        print(f"Conectado a las colas: {queue_movies} y {queue_recommendations}")
-        return channel
-    except pika.exceptions.AMQPConnectionError as e:
-        print(f"Error al conectar con RabbitMQ: {e}", file=sys.stderr)
-        return None
-    except Exception as e:
-        print(f"Error inesperado: {e}", file=sys.stderr)
-        return None
+    while True:
+        try:            
+            connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_host))
+            channel = connection.channel()
+            
+            channel.queue_declare(queue=queue_movies, durable=True)
+            channel.queue_declare(queue=queue_recommendations, durable=True)
+                        
+            print(f"Conectado a las colas: {queue_movies} y {queue_recommendations}")
+            return channel
+        except pika.exceptions.AMQPConnectionError as e:            
+            print(f"Error al conectar con RabbitMQ: {e}", file=sys.stderr)
+        except Exception as e:
+            print(f"Error inesperado: {e}", file=sys.stderr)
+                
+        print("Reintentando en 5 segundos...")
+        time.sleep(5)
     
 def close_connection():
     global connection
