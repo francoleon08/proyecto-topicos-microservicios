@@ -21,7 +21,9 @@ def process_recommendations(movie_history_data):
     movies_dataframe = prepare_recommendations(movie_history_data)
     recommended = recommend_movies(movie_history_data, movies_dataframe)
     best_movie = get_best_movie(recommended)
-    black_list.append(best_movie["title"])    
+    for movie in movie_history_data:
+        black_list.append(movie["title"])
+    black_list.append(best_movie["title"])  
     return best_movie
 
 # Prepara el dataframe con las peliculas recomendadas para su posterior analisis
@@ -70,8 +72,9 @@ def create_dataframe(movies_data):
     movies_pd['directors_clean'] = movies_pd['directors'].apply(
         lambda x: ', '.join(director.lower().replace(" ", "") for director in x) if isinstance(x, list) else ''
     )
+    movies_pd['plot_clean'] = movies_pd['plot'].apply(lambda x: x.lower().replace(" ", ""))
     
-    movies_pd['soup'] = movies_pd.apply(lambda x: ' '.join([str(x['title']), str(x['genres_clean']), str(x['cast_clean']), str(x['directors_clean'])]), axis=1)    
+    movies_pd['soup'] = movies_pd.apply(lambda x: ' '.join([str(x['title']), str(x['genres_clean']), str(x['cast_clean']), str(x['directors_clean']), str(x['plot_clean'])]), axis=1)    
     return movies_pd
 
 # Por cada pelicula en la lista, recomienda una pelicula
