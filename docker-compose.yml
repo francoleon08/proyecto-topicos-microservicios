@@ -106,6 +106,25 @@ services:
     networks:
       - rabbit-tier
       - general
+  
+  recommender:
+    image: recommender-image
+    build:
+      context: ./recomendador
+      dockerfile: Dockerfile    
+    environment:
+      - RABBITMQ_HOST=amqp://admin:admin@rabbitmq:5672
+      - QUEUE_MOVIES=movies
+      - QUEUE_RECOMMENDATIONS=recommendation
+      - LIMIT_MOVIES=5
+      - LIMIT_MOVIES_SEARCH=1000
+      - URL_MOVIES=http://movies:3000
+    depends_on:
+      - rabbitmq
+      - proxy
+    networks:
+      - rabbit-tier
+      - general
 
 networks:
   cache-tier:

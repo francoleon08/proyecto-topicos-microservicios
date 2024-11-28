@@ -1,5 +1,7 @@
 const amqp = require("amqplib/callback_api");
 const express = require("express");
+const cors = require('cors');
+
 const app = express();
 
 const PORT = process.env.PORT || 3000;
@@ -11,6 +13,7 @@ const RABBIT_RECOMMENDATIONS_QUEUE = process.env.RABBITMQ_RECOMMENDATIONS_QUEUE;
 let channel;
 let movies = [];
 
+app.use(cors());
 app.use(express.json());
 
 connectRabbitMQ()
