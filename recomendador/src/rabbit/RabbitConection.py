@@ -2,6 +2,7 @@ from ..service.ServiceRecommender import process_recommendation
 from ..movies.UtilsMovies import fetch_movie_by_id, get_id_from_movie
 from dotenv import load_dotenv
 import pika
+import sys
 import os
 import json
 
@@ -17,14 +18,22 @@ connection = None
 movies_buffer = []
 
 def init_connection():    
+    print("Iniciando conexión con RabbitMQ")
     global connection
-    connection = connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_host))
-    channel = connection.channel()
-    channel.queue_declare(queue=queue_movies, durable=True)
-    channel.queue_declare(queue=queue_recommendations, durable=True)
-    print(f"Conectado a las colas: {queue_movies} y {queue_recommendations}")
-    return channel
-
+    try:
+        connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_host))
+        channel = connection.channel()
+        channel.queue_declare(queue=queue_movies, durable=True)
+        channel.queue_declare(queue=queue_recommendations, durable=True)
+        print(f"Conectado a las colas: {queue_movies} y {queue_recommendations}")
+        return channel
+    except pika.exceptions.AMQPConnectionError as e:
+        print(f"Error al conectar con RabbitMQ: {e}", file=sys.stderr)
+        return None
+    except Exception as e:
+        print(f"Error inesperado: {e}", file=sys.stderr)
+        return None
+    
 def close_connection():
     global connection
     if connection:

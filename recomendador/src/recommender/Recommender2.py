@@ -12,7 +12,7 @@ warnings.filterwarnings('ignore')
 load_dotenv()
 
 URL_MOVIES = os.getenv('URL_MOVIES')
-LIMIT_MOVIES_SEARCH = os.getenv('LIMIT_MOVIES_SEARCH')
+LIMIT_MOVIES_SEARCH = int(os.getenv('LIMIT_MOVIES_SEARCH'))
 
 # Lista de peliculas que no se deben recomendar, ya que ya fueron recomendadas
 black_list = []
@@ -58,8 +58,7 @@ def build_common_filter(movie_data):
 def create_dataframe(movies_data):
     movies_pd = pd.DataFrame(movies_data)    
 
-    movies_pd['genres_clean'] = movies_pd['genres'].apply(lambda x: ', '.join(genre.lower().replace(" ", "") for genre in x))
-    #movies_pd['cast_clean'] = movies_pd['cast'].apply(lambda x: ', '.join(actor.lower().replace(" ", "") for actor in x))
+    movies_pd['genres_clean'] = movies_pd['genres'].apply(lambda x: ', '.join(genre.lower().replace(" ", "") for genre in x))    
     movies_pd['cast_clean'] = movies_pd['cast'].apply(
         lambda x: ', '.join(actor.lower().replace(" ", "") for actor in x) if isinstance(x, list) else ''
     )
