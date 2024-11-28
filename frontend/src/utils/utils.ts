@@ -29,13 +29,13 @@ export const getRecommendation = async () => {
 };
 
 export const searchMovie = async (search: string) => {
-  const url = import.meta.env.VITE_URL_MOVIES + "/movies/search";
+  const url = import.meta.env.VITE_URL_MOVIES + "/movies/title";
   return new Promise<Movie[]>(async (resolve) => {
     try {
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: search, limit: 30 }),
+        body: JSON.stringify({ title: search}),
       });
       if (!response.ok) console.error("Response Error: ", response.statusText);
       else resolve(await response.json());
