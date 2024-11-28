@@ -10,7 +10,6 @@
     "type": "git",
     "url": "git+https://github.com/francoleon08/proyecto-topicos-microservicios.git#master"
   },
-  "author": "Franco Leon, Manuel Lagos",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/francoleon08/proyecto-topicos-microservicios/issues"
