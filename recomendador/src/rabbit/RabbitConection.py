@@ -66,11 +66,13 @@ def process_movie(body):
     movies_buffer.append(movie)
 
 def send_recomendation(channel, message):    
+    print(message)
     recommendation = {
         "imdb": message["imdb"],
         "title": message["title"],
         "poster": message["poster"],
-        "plot": message["plot"],
+        "plot": "null" if message["plot"] == "nan" else message["plot"],
+        "poster": "null" if message["poster"] == "nan" else message["poster"],
         "genres" : message["genres"],
         "year": message["year"]
     }
