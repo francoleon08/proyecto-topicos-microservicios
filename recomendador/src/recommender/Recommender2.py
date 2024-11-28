@@ -25,10 +25,15 @@ def process_recommendations(movie_history_data):
     return best_movie
 
 # Prepara el dataframe con las peliculas recomendadas para su posterior analisis
-def prepare_recommendations(movie_history_data):
+def prepare_recommendations(movie_history_data):       
     filter = build_common_filter(movie_history_data)
     movies = get_movies_by_filter(filter, limit=LIMIT_MOVIES_SEARCH)
-    movies = [movie for movie in movies if movie["title"] not in black_list]
+    movies = [
+        movie for movie in movies 
+            if movie["title"] not in black_list 
+            and "plot" in movie 
+            and "poster" in movie
+    ]
     movies_dataframe = create_dataframe(movies)
     return movies_dataframe
         
@@ -116,7 +121,7 @@ def get_similar_movies(cosine_sim, idx, n=10, self_exclude=True):
     return sim_scores
 
 # En base a una lista de peliculas, devuelve la mejor pelicula segun el rating ponderado y la cantidad de votos
-def get_best_movie(movies):    
+def get_best_movie(movies):        
     movies_with_wr = calculate_weighted_rating(movies)
     best_movie = max(movies_with_wr, key=lambda x: x['weighted_rating'])
     return best_movie
