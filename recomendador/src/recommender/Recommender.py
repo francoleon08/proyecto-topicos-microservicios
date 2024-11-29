@@ -1,209 +1,142 @@
-import pandas as pd
-import numpy as np
-import requests
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+from ..movies.UtilsMovies import get_movies_by_filter
 from collections import Counter
 from dotenv import load_dotenv
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+import numpy as np
 import os
 import warnings
-import time
-import re
-import json
 
 warnings.filterwarnings('ignore')
 load_dotenv()
 
 URL_MOVIES = os.getenv('URL_MOVIES')
+LIMIT_MOVIES_SEARCH = int(os.getenv('LIMIT_MOVIES_SEARCH'))
 
-def clean(clean):
-    if not clean or not isinstance(clean, list):
-        return ""
-    return ', '.join(str(i.lower().replace(" ", "")) for i in clean)
+# Lista de peliculas que no se deben recomendar, ya que ya fueron recomendadas
+black_list = []
 
-def query_random_movie_endpoint(limit=1):
-    try:
-        url = f"{URL_MOVIES}/movies/random?limit={limit}"
-        response = requests.get(url)
-        response.raise_for_status()
-        movies = response.json()
-
-        if movies:
-            return movies[0]  
-        return None
-    except Exception as e:
-        print(f"Error querying random movie endpoint: {e}")
-        return None
-
-def query_filter_endpoint(best_genre_json, best_cast_json, best_director_json, best_language_json):
-    try:
-        limit=1000
-        url = f"{URL_MOVIES}/movies/filter?limit={limit}" 
-        headers = {"Content-Type": "application/json"}
-    
-        response_genre = requests.post(url, body=best_genre_json, headers=headers)
-        response_genre.raise_for_status()  
-        movies_genre = set(response_genre.json())
-        
-        response_cast = requests.post(url, body=best_cast_json, headers=headers)
-        response_cast.raise_for_status()  
-        movies_cast = set(response_cast.json())
-        
-        response_director = requests.post(url, body=best_director_json, headers=headers)
-        response_director.raise_for_status()  
-        movies_director = set(response_director.json())
-        
-        response_language = requests.post(url, body=best_language_json, headers=headers)
-        response_language.raise_for_status()  
-        movies_language = set(response_language.json())
-        
-        top_movies = movies_genre.intersection(movies_cast.intersection(movies_director.intersection(movies_language)))
-
-        if top_movies: 
-            best_movie = max(top_movies, key=lambda x: float(x.get('imdb', {}).get('rating', 0) or 0))
-            return best_movie
-        else:
-            top_movies = movies_genre.intersection(movies_cast.intersection(movies_director))
-            if top_movies:
-                best_movie = max(top_movies, key=lambda x: float(x.get('imdb', {}).get('rating', 0) or 0))
-                return best_movie
-            else:
-                top_movies = movies_genre.intersection(movies_cast)
-                if top_movies:
-                    best_movie = max(top_movies, key=lambda x: float(x.get('imdb', {}).get('rating', 0) or 0))
-                    return best_movie
-
-        return None  
-    
-    except Exception as e:
-        print(f"Error querying filter endpoint with filters")
-        return None
-
-def extract_predominant_from_soup(soup):
-    tokens = soup.split()
-    token_counts = Counter(tokens)
-
-    genre_counts = Counter([token for token in tokens if token.startswith("genre:")])
-    cast_counts = Counter([token for token in tokens if token.startswith("cast:")])
-    director_counts = Counter([token for token in tokens if token.startswith("director:")])
-    language_counts = Counter([token for token in tokens if token.startswith("language:")])
-
-    predominant_genre = genre_counts.most_common(1)[0][0] if genre_counts else None
-    predominant_cast = cast_counts.most_common(1)[0][0] if cast_counts else None
-    predominant_director = director_counts.most_common(1)[0][0] if director_counts else None
-    predominant_language = language_counts.most_common(1)[0][0] if language_counts else None
-
-    return predominant_genre, predominant_cast, predominant_director, predominant_language
-
-def extract_movie_details(filters, field):
-    cast_list = filters.get("cast", [])
-    directors_list = filters.get("directors", [])
-    genres_list = filters.get("genres", [])
-    languages_list = filters.get("languages", [])
-
-    predominant_cast = Counter(cast_list).most_common(1)[0][0] if cast_list else None
-    predominant_director = Counter(directors_list).most_common(1)[0][0] if directors_list else None
-    predominant_genre = Counter(genres_list).most_common(1)[0][0] if genres_list else None
-    predominant_language = Counter(languages_list).most_common(1)[0][0] if languages_list else None
-
-    if field == 0:
-        return predominant_genre
-    
-    if field == 1:
-        return predominant_cast
-    
-    if field == 2:
-        return predominant_director
-    
-    if field == 3:
-        return predominant_language
-    
-def process_recommendations(movie_history_data):
-    movie_history = pd.DataFrame(movie_history_data)              
-
-    movie_history['genres_clean'] = movie_history['genres'].apply(clean)
-    genres_list = movie_history['genres_clean'].apply(lambda x: x.split(', ')).tolist()
-    
-    movie_history['cast_clean'] = movie_history['cast'].apply(clean)
-    cast_list = movie_history['cast_clean'].apply(lambda x: x.split(', ')).tolist()
-    
-    movie_history['directors_clean'] = movie_history['directors'].apply(clean)
-    directors_list = movie_history['directors_clean'].apply(lambda x: x.split(', ')).tolist()
-    
-    movie_history['languages_clean'] = movie_history['languages'].apply(clean)
-    languages_list = movie_history['languages_clean'].apply(lambda x: x.split(', ')).tolist()
-
-    movie_history['soup'] = movie_history.apply(
-        lambda x: ' '.join([
-            str(x['title']),
-            ' '.join([f"genre:{genre}" for genre in genres_list[x.name] if genre]),  
-            ' '.join([f"cast:{member}" for member in cast_list[x.name] if member]),  
-            ' '.join([f"director:{director}" for director in directors_list[x.name] if director]), 
-            ' '.join([f"language:{lang}" for lang in languages_list[x.name] if lang])  
-        ]),
-        axis=1
-    )
- 
-    predominant_features = movie_history['soup'].apply(extract_predominant_from_soup) 
-
-    predominant_genres, predominant_cast, predominant_directors, predominant_languages = zip(*predominant_features)
-
-    filters = {
-        'genres': tuple(g for g in predominant_genres if g),
-        'cast': tuple(c for c in predominant_cast if c),
-        'directors': tuple(d for d in predominant_directors if d),
-        'languages': tuple(l for l in predominant_languages if l),
-    }
-
-    best_genre = extract_movie_details(filters,0)
-    best_genre_json = json.dumps(best_genre)
-    
-    best_cast = extract_movie_details(filters,1)
-    best_cast_json = json.dumps(best_cast)
-    
-    best_directors = extract_movie_details(filters,2)
-    best_director_json = json.dumps(best_directors)
-    
-    best_languages = extract_movie_details(filters,3)
-    best_languages_json = json.dumps(best_languages)
-
-    best_movie = query_filter_endpoint(best_genre_json,best_cast_json,best_director_json,best_languages_json)
-    
+def process_recommendations(movie_history_data):    
+    movies_dataframe = prepare_recommendations(movie_history_data)
+    recommended = recommend_movies(movie_history_data, movies_dataframe)
+    best_movie = get_best_movie(recommended)
+    for movie in movie_history_data:
+        black_list.append(movie["title"])
+    black_list.append(best_movie["title"])  
     return best_movie
 
-    #best_movie_based_on_genre = query_filter_endpoint(best_genre, limit=1000)
+# Prepara el dataframe con las peliculas recomendadas para su posterior analisis
+def prepare_recommendations(movie_history_data):       
+    filter = build_common_filter(movie_history_data)
+    movies = get_movies_by_filter(filter, limit=LIMIT_MOVIES_SEARCH)
+    movies = [
+        movie for movie in movies 
+            if movie["title"] not in black_list 
+            and "plot" in movie 
+            and "poster" in movie
+    ]
+    movies_dataframe = create_dataframe(movies)
+    return movies_dataframe
+        
+def build_common_filter(movie_data):
+    all_genres = []
+    all_cast = []
+    all_directors = []
     
-    #return best_movie_based_on_genre
-
-    #best_filters = extract_movie_details(filters)
+    for movie in movie_data:        
+        if "genres" in movie and movie["genres"]:
+            all_genres.extend(movie["genres"])
+        if "cast" in movie and movie["cast"]:
+            all_cast.extend(movie["cast"])
+        if "directors" in movie and movie["directors"]:
+            all_directors.extend(movie["directors"])
     
-    #return best_filters
-   
-    #best_movie = query_filter_endpoint(best_filters, limit=1000)
-
-    if best_movie:
-        return {
-            "source_movies": movie_history['title'].tolist(), 
-            "recommended_movie_best": {
-                "imdb": best_movie.get("imdb"),
-                "title": best_movie.get("title"),
-                "poster": best_movie.get("poster"),
-                "plot": best_movie.get("plot"),
-                "genres": best_movie.get("genres"),  
-                "year": best_movie.get("year")
-            }
-        }
-
-    random_movie = query_random_movie_endpoint(limit=1)
+    most_common_genre = Counter(all_genres).most_common(1)
+    most_common_cast = Counter(all_cast).most_common(1)
+    most_common_director = Counter(all_directors).most_common(1)
     
     return {
-        "source_movies": movie_history['title'].tolist(),
-        "recommended_movie_random": {
-            "imdb": random_movie.get("imdb"),
-            "title": random_movie.get("title"),
-            "poster": random_movie.get("poster"),
-            "plot": random_movie.get("plot"),
-            "genres": random_movie.get("genres"),
-            "year": random_movie.get("year")  
-        }
+        "genres": [most_common_genre[0][0] if most_common_genre else None],
+        "cast": [most_common_cast[0][0] if most_common_cast else None],
+        "directors": [most_common_director[0][0] if most_common_director else None]
     }
+    
+def create_dataframe(movies_data):
+    movies_pd = pd.DataFrame(movies_data)    
+
+    movies_pd['genres_clean'] = movies_pd['genres'].apply(lambda x: ', '.join(genre.lower().replace(" ", "") for genre in x))    
+    movies_pd['cast_clean'] = movies_pd['cast'].apply(
+        lambda x: ', '.join(actor.lower().replace(" ", "") for actor in x) if isinstance(x, list) else ''
+    )
+    movies_pd['directors_clean'] = movies_pd['directors'].apply(
+        lambda x: ', '.join(director.lower().replace(" ", "") for director in x) if isinstance(x, list) else ''
+    )
+    movies_pd['plot_clean'] = movies_pd['plot'].apply(lambda x: x.lower().replace(" ", ""))
+    
+    movies_pd['soup'] = movies_pd.apply(lambda x: ' '.join([str(x['title']), str(x['genres_clean']), str(x['cast_clean']), str(x['directors_clean']), str(x['plot_clean'])]), axis=1)    
+    return movies_pd
+
+# Por cada pelicula en la lista, recomienda una pelicula
+# Luego devuelve la mejor pelicula segun el rating ponderado y la cantidad de votos
+def recommend_movies(movies, movies_pd):
+    recommended_movies = []
+    for movie in movies:
+        recommended_movie = recommend_movie(movies_pd, movie["title"])
+        recommended_movies.append(recommended_movie.iloc[0].to_dict())
+    return recommended_movies
+
+def recommend_movie(movies_pd, title, n=10, self_exclude=True):    
+    cosine_sim = calculate_cosine_similarity_matrix(movies_pd)
+    idx = get_movie_index(movies_pd, title, cosine_sim)
+    sim_scores = get_similar_movies(cosine_sim, idx, n, self_exclude)
+    
+    movie_indices = [i[0] for i in sim_scores]
+    scores = [i[1] for i in sim_scores]
+    
+    recommended_movies = movies_pd.iloc[movie_indices].copy()
+    recommended_movies['sim_score'] = scores
+    
+    return recommended_movies
+
+def calculate_cosine_similarity_matrix(movies_pd):    
+    vectorizer = CountVectorizer(analyzer='word', ngram_range=(1, 2), min_df=0.0, stop_words='english')
+    count_matrix = vectorizer.fit_transform(movies_pd['soup'])
+    return cosine_similarity(count_matrix, count_matrix)
+
+def get_movie_index(movies_pd, title, cosine_sim):    
+    indices = pd.Series(movies_pd.index, index=movies_pd['title'])
+    try:        
+        idx = indices[title]
+    except KeyError:        
+        idx = max(enumerate(cosine_sim), key=lambda x: max(x[1]))[0]
+    return idx
+
+def get_similar_movies(cosine_sim, idx, n=10, self_exclude=True):    
+    sim_scores = list(enumerate(cosine_sim[idx]))
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+    
+    if self_exclude:
+        sim_scores = sim_scores[1:n+1]
+    else:
+        sim_scores = sim_scores[0:n+1]
+
+    return sim_scores
+
+# En base a una lista de peliculas, devuelve la mejor pelicula segun el rating ponderado y la cantidad de votos
+def get_best_movie(movies):        
+    movies_with_wr = calculate_weighted_rating(movies)
+    best_movie = max(movies_with_wr, key=lambda x: x['weighted_rating'])
+    return best_movie
+
+def calculate_weighted_rating(movies):
+    votes = np.array([movie["imdb"]["votes"] for movie in movies])    
+    c = np.median(votes)
+    
+    for movie in movies:
+        rating = movie['imdb']['rating']
+        votes_count = movie['imdb']['votes']
+            
+        movie['weighted_rating'] = (votes_count * rating) / (votes_count + c)
+    
+    return movies
