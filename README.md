@@ -44,7 +44,7 @@ The Recommender microservice receives click data from the History service throug
 To run this project, simply build and run the Docker Compose file. Before doing so, ensure that you meet all the requirements specified in the README files located in each microservice's folder.
 
 ### Usage
-After completing the installation and ensuring all services are running, visit the following link to access the final result of the project: ""
+After completing the installation and ensuring all services are running, visit the following link to access the final result of the project: "http://localhost:80/".
 
 
 
@@ -89,4 +89,4 @@ El microservicio Recommender recibe los datos de clics del servicio History a tr
 Para ejecutar este proyecto, simplemente construye y ejecuta el archivo de Docker Compose. Antes de hacerlo, asegúrate de cumplir con todos los requisitos especificados en los archivos README ubicados en la carpeta de cada microservicio.
 
 # Uso
-Después de completar la instalación y asegurarte de que todos los servicios estén en funcionamiento, visita el siguiente enlace para acceder al resultado final del proyecto: "".
+Después de completar la instalación y asegurarte de que todos los servicios estén en funcionamiento, visita el siguiente enlace para acceder al resultado final del proyecto: "http://localhost:80/".
