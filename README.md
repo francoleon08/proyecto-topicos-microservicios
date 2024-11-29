@@ -41,7 +41,7 @@ The History microservice tracks user interactions with the frontend. Each time a
 The Recommender microservice receives click data from the History service through the movies queue. It analyzes the received data and generates new movie recommendations. These recommendations are then sent back to the frontend via the recommendation queue.
 
 ## Installation
-To run this project, simply build and run the Docker Compose file. Before doing so, ensure that you meet all the requirements specified in the README files located in each microservice's folder.
+To run this project, simply build and run the Docker Compose file with "docker-compose up --build". Before doing so, ensure that you meet all the requirements specified in the README files located in each microservice's folder.
 
 ### Usage
 After completing the installation and ensuring all services are running, visit the following link to access the final result of the project: "http://localhost:80/".
@@ -86,7 +86,7 @@ El microservicio History rastrea las interacciones de los usuarios con el fronte
 El microservicio Recommender recibe los datos de clics del servicio History a través de la cola movies. Analiza los datos recibidos y genera nuevas recomendaciones de películas. Estas recomendaciones se envían de vuelta al frontend a través de la cola recommendation.
 
 # Instalación
-Para ejecutar este proyecto, simplemente construye y ejecuta el archivo de Docker Compose. Antes de hacerlo, asegúrate de cumplir con todos los requisitos especificados en los archivos README ubicados en la carpeta de cada microservicio.
+Para ejecutar este proyecto, simplemente construye y ejecuta el archivo de Docker Compose con "docker-compose up --build". Antes de hacerlo, asegúrate de cumplir con todos los requisitos especificados en los archivos README ubicados en la carpeta de cada microservicio.
 
 # Uso
 Después de completar la instalación y asegurarte de que todos los servicios estén en funcionamiento, visita el siguiente enlace para acceder al resultado final del proyecto: "http://localhost:80/".
